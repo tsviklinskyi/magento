@@ -91,7 +91,7 @@ class TSG_CallCenter_Model_Observer
             $matchedEmails = $this->checkCollectionAndSaveRelations($ordersCollection, $flags, $itemQueue->getUserId());
             if (!empty($matchedEmails)) {
                 $ordersCollection2->addFieldToFilter('customer_email', array('in' => $matchedEmails));
-                $this->checkCollectionAndSaveRelations($ordersCollection2, $flags, $itemQueue->getUserId());
+                $this->checkCollectionAndSaveRelations($ordersCollection2, $flags, $itemQueue->getUserId(), $itemQueue->getId());
             }
         }
         Mage::log('TSG CallCenter queueDistribution finished at ' . date('Y-m-d H:i:s'), null, 'tsg_callcenter_queue.log', true);
@@ -155,7 +155,7 @@ class TSG_CallCenter_Model_Observer
         return $flags;
     }
 
-    protected function checkCollectionAndSaveRelations($ordersCollection, $flags, $initiatorId)
+    protected function checkCollectionAndSaveRelations($ordersCollection, $flags, $initiatorId, $queueId)
     {
         $matchedEmails = array();
         foreach ($ordersCollection as $order) {
@@ -176,7 +176,13 @@ class TSG_CallCenter_Model_Observer
                 if(null === $order->getPrimaryInitiatorId()){
                     $order->setPrimaryInitiatorId($initiatorId);
                 }
-                //$order->save();
+                $order->save();
+                $model = Mage::getModel('callcenter/queue');
+                try {
+                    $model->setId($queueId)->delete();
+                } catch (Exception $e){
+                    echo $e->getMessage();
+                }
             }
         }
         return $matchedEmails;
