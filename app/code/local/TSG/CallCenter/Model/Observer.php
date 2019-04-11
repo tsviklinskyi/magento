@@ -88,7 +88,7 @@ class TSG_CallCenter_Model_Observer
                     break;
             }
             $ordersCollection2 = clone $ordersCollection;
-            $matchedEmails = $this->checkCollectionAndSaveRelations($ordersCollection, $flags, $itemQueue->getUserId());
+            $matchedEmails = $this->checkCollectionAndSaveRelations($ordersCollection, $flags, $itemQueue->getUserId(), $itemQueue->getId());
             if (!empty($matchedEmails)) {
                 $ordersCollection2->addFieldToFilter('customer_email', array('in' => $matchedEmails));
                 $this->checkCollectionAndSaveRelations($ordersCollection2, $flags, $itemQueue->getUserId(), $itemQueue->getId());
