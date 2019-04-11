@@ -76,6 +76,7 @@ class TSG_CallCenter_Model_Observer
             $modelOrder = Mage::getModel('sales/order');
             $ordersCollection = $modelOrder->getCollection();
             $ordersCollection->addFieldToFilter('initiator_id', array('null' => true));
+            //$ordersCollection->addFieldToFilter('entity_id', array('eq' => 195));
             switch ($userData['orders_type']){
                 case 1:
                     $ordersCollection->addFieldToFilter('created_at', $this->getTimeRangeArray(20,8));
@@ -163,11 +164,16 @@ class TSG_CallCenter_Model_Observer
             foreach ($order->getAllItems() as $orderItem) {
                 $customProductType = Mage::getModel('catalog/product')->load($orderItem->getProductId())->getAttributeText('custom_product_type');
                 //$customProductType = Mage::getResourceModel('catalog/product')->getAttributeRawValue($orderItem->getProductId(), 'custom_product_type', $order->getStoreId());
-                if (false === $flags[$customProductType]) {
-                    continue 2; // if find one 'false' go to check next order
-                }
-                if (true === $flags[$customProductType]) {
+                if (true === $flags[$customProductType] && count($flags) == 1) {
                     $orderMatch = true;
+                    break;
+                }else{
+                    if (false === $flags[$customProductType]) {
+                        continue 2; // if find one 'false' go to check next order
+                    }
+                    if (true === $flags[$customProductType]) {
+                        $orderMatch = true;
+                    }
                 }
             }
             if ($orderMatch) {
