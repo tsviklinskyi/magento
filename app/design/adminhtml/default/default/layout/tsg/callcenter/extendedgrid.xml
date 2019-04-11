@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<layout version="0.1.0">
+    <sales_order_grid_update_handle>
+        <reference name="sales_order.grid">
+            <action method="addColumnAfter">
+                <columnId>customer_email</columnId>
+                <arguments>
+                    <header>Customer e-mail</header>
+                    <index>customer_email</index>
+                    <filter_index>customer_email</filter_index>
+                    <type>text</type>
+                </arguments>
+                <after>shipping_name</after>
+            </action>
+            <action method="addColumnAfter">
+                <columnId>initiator_name</columnId>
+                <arguments>
+                    <header>Initiator</header>
+                    <index>initiator_name</index>
+                    <filter_index>admin_user.firstname</filter_index>
+                    <type>text</type>
+                </arguments>
+                <after>customer_email</after>
+            </action>
+            <action method="addColumnAfter">
+                <columnId>primary_initiator_name</columnId>
+                <arguments>
+                    <header>Primary initiator</header>
+                    <index>primary_initiator_name</index>
+                    <filter_index>admin_user.firstname</filter_index>
+                    <type>text</type>
+                </arguments>
+                <after>initiator_name</after>
+            </action>
+        </reference>
+    </sales_order_grid_update_handle>
+    <adminhtml_sales_order_grid>
+        <update handle="sales_order_grid_update_handle" />
+    </adminhtml_sales_order_grid>
+    <adminhtml_sales_order_index>
+        <reference name="head">
+            <action method="addJs"><script>tsg/sales_order_grid.js</script></action>
+        </reference>
+        <update handle="sales_order_grid_update_handle" />
+    </adminhtml_sales_order_index>
+</layout>

@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <TSG_CallCenter>
+            <active>true</active>
+            <codePool>local</codePool>
+        </TSG_CallCenter>
+    </modules>
+</config>
