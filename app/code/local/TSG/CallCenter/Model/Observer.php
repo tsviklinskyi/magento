@@ -78,7 +78,6 @@ class TSG_CallCenter_Model_Observer
             $modelOrder = Mage::getModel('sales/order');
             $ordersCollection = $modelOrder->getCollection();
             $ordersCollection->addFieldToFilter('initiator_id', array('null' => true));
-            //$ordersCollection->addFieldToFilter('entity_id', array('eq' => 195));
             switch ($userData['orders_type']){
                 case 1:
                     $ordersCollection->addFieldToFilter('created_at', $this->getTimeRangeArray(20,8));
@@ -90,11 +89,11 @@ class TSG_CallCenter_Model_Observer
                     // do nothing
                     break;
             }
-            //$ordersCollection2 = clone $ordersCollection;
+            $ordersCollection2 = clone $ordersCollection;
             $matchedEmails = $this->checkCollectionAndSaveRelations($ordersCollection, $flags, $itemQueue->getUserId());
             if (!empty($matchedEmails)) {
-                //$ordersCollection2->addFieldToFilter('customer_email', array('in' => $matchedEmails));
-                //$this->checkCollectionAndSaveRelations($ordersCollection2, $flags, $itemQueue->getUserId());
+                $ordersCollection2->addFieldToFilter('customer_email', array('in' => $matchedEmails));
+                $this->checkCollectionAndSaveRelations($ordersCollection2, $flags, $itemQueue->getUserId());
             }
         }
         Mage::log('TSG CallCenter queueDistribution finished at ' . date('Y-m-d H:i:s'), null, 'tsg_callcenter_queue.log', true);
