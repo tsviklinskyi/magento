@@ -13,12 +13,10 @@ class TSG_CallCenter_Model_Observer
         $select->joinLeft(
             array('admin_user'),
             'admin_user.user_id = sales_flat_order.initiator_id',
-            array('initiator_name' => 'CONCAT(admin_user.firstname, " ", admin_user.lastname)')
-        );
-        $select->joinLeft(
-            array('admin_user'),
-            'admin_user.user_id = sales_flat_order.primary_initiator_id',
-            array('primary_initiator_name' => 'CONCAT(admin_user.firstname, " ", admin_user.lastname)')
+            array(
+                'initiator_name' => 'CONCAT(admin_user.firstname, " ", admin_user.lastname)',
+                'primary_initiator_name' => 'CONCAT(admin_user.firstname, " ", admin_user.lastname)'
+            )
         );
 
         $this->_filterCollectionByRole($collection);
@@ -178,7 +176,7 @@ class TSG_CallCenter_Model_Observer
                 if(null === $order->getPrimaryInitiatorId()){
                     $order->setPrimaryInitiatorId($initiatorId);
                 }
-                $order->save();
+                //$order->save();
             }
         }
         return $matchedEmails;
