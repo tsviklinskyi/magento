@@ -37,6 +37,11 @@
                 </rewrite>
             </adminhtml>
         </blocks>
+        <helpers>
+            <callcenter>
+                <class>TSG_CallCenter_Helper</class>
+            </callcenter>
+        </helpers>
     </global>
     <admin>
         <routers>

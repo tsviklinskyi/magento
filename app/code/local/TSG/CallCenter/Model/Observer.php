@@ -1,6 +1,11 @@
 <?php
 class TSG_CallCenter_Model_Observer
 {
+    /**
+     * Update collection before load, join tables and add filters
+     * @param $observer
+     * @return $this
+     */
     public function salesOrderGridCollectionLoadBefore($observer)
     {
         $collection = $observer->getOrderGridCollection();
@@ -27,8 +32,13 @@ class TSG_CallCenter_Model_Observer
         $select->group('sfu.entity_id');
 
         $this->_filterCollectionByRole($collection);
+        return $this;
     }
 
+    /**
+     * Add user role filter to collection
+     * @param $collection
+     */
     private function _filterCollectionByRole($collection)
     {
         $modelQueue = Mage::getModel('callcenter/queue');
@@ -39,6 +49,11 @@ class TSG_CallCenter_Model_Observer
         }
     }
 
+    /**
+     * Adding new buttons to grid and order view page
+     * @param $observer
+     * @return $this
+     */
     public function addNewButtons($observer)
     {
         $container = $observer->getBlock();
@@ -72,6 +87,9 @@ class TSG_CallCenter_Model_Observer
         return $this;
     }
 
+    /**
+     * Distribution queue of waiting users, save relations users with orders and clear queue
+     */
     public function queueDistribution()
     {
         Mage::log('TSG CallCenter queueDistribution was run at ' . date('Y-m-d H:i:s'), null, 'tsg_callcenter_queue.log', true);
@@ -79,125 +97,29 @@ class TSG_CallCenter_Model_Observer
         $collectionQueue = $modelQueue->getCollection()->setOrder('request_date', 'ASC');
         foreach ($collectionQueue as $itemQueue){
             $userData = Mage::getModel('admin/user')->load($itemQueue->getUserId())->getData();
-            $flags = $this->getLabels($userData['products_type']);
+            $productsCriteria = Mage::helper('callcenter')->generateProductsCriteria($userData['products_type']);
             $modelOrder = Mage::getModel('sales/order');
             $ordersCollection = $modelOrder->getCollection();
             $ordersCollection->addFieldToFilter('initiator_id', array('null' => true));
             //$ordersCollection->addFieldToFilter('entity_id', array('eq' => 195));
             switch ($userData['orders_type']){
                 case 1:
-                    $ordersCollection->addFieldToFilter('created_at', $this->getTimeRangeArray(20,8));
+                    $ordersCollection->addFieldToFilter('created_at', Mage::helper('callcenter')->getTimeRangeArray(20,8));
                     break;
                 case 2:
-                    $ordersCollection->addFieldToFilter('created_at', $this->getTimeRangeArray(8,20));
+                    $ordersCollection->addFieldToFilter('created_at', Mage::helper('callcenter')->getTimeRangeArray(8,20));
                     break;
                 default:
                     // do nothing
                     break;
             }
             $ordersCollection2 = clone $ordersCollection;
-            $matchedEmails = $this->checkCollectionAndSaveRelations($ordersCollection, $flags, $itemQueue->getUserId(), $itemQueue->getId());
+            $matchedEmails = Mage::helper('callcenter')->checkCollectionAndSaveRelations($ordersCollection, $productsCriteria, $itemQueue->getUserId(), $itemQueue->getId());
             if (!empty($matchedEmails)) {
                 $ordersCollection2->addFieldToFilter('customer_email', array('in' => $matchedEmails));
-                $this->checkCollectionAndSaveRelations($ordersCollection2, $flags, $itemQueue->getUserId(), $itemQueue->getId());
+                Mage::helper('callcenter')->checkCollectionAndSaveRelations($ordersCollection2, $productsCriteria, $itemQueue->getUserId(), $itemQueue->getId());
             }
         }
         Mage::log('TSG CallCenter queueDistribution finished at ' . date('Y-m-d H:i:s'), null, 'tsg_callcenter_queue.log', true);
-    }
-
-    protected function getTimeRangeArray($from, $to)
-    {
-        $arr = array();
-        $n = $to;
-        if ($from > $to){
-            $n = $from + 23;
-        }
-        for($i = $from; $i < $n; $i++){
-            if($i == 24){
-                $i = 0;
-                $n = $to;
-            }
-            $like = $i;
-            if(strlen($like) == 1){
-                $like = '0' . $like;
-            }
-            $arr[] = array('like' => '% '.$like.':%');
-        }
-        return $arr;
-    }
-
-    protected function getLabels($productsType)
-    {
-        $flags = array();
-        switch ($productsType){
-            case '1':
-                $flags = array(
-                    Mage::getModel('callcenter/queue')->getProductTypes()['1'] => true
-                );
-                break;
-            case '2':
-                $flags = array(
-                    Mage::getModel('callcenter/queue')->getProductTypes()['1'] => false,
-                    Mage::getModel('callcenter/queue')->getProductTypes()['2'] => true
-                );
-                break;
-            case '3':
-                $flags = array(
-                    Mage::getModel('callcenter/queue')->getProductTypes()['1'] => false,
-                    Mage::getModel('callcenter/queue')->getProductTypes()['2'] => false,
-                    Mage::getModel('callcenter/queue')->getProductTypes()['3'] => true
-                );
-                break;
-            case '0':
-                $flags = array(
-                    Mage::getModel('callcenter/queue')->getProductTypes()['1'] => false,
-                    Mage::getModel('callcenter/queue')->getProductTypes()['2'] => false,
-                    Mage::getModel('callcenter/queue')->getProductTypes()['3'] => false,
-                    Mage::getModel('callcenter/queue')->getProductTypes()['0'] => true
-                );
-                break;
-            default:
-                // do nothing
-                break;
-        }
-        return $flags;
-    }
-
-    protected function checkCollectionAndSaveRelations($ordersCollection, $flags, $initiatorId, $queueId)
-    {
-        $matchedEmails = array();
-        foreach ($ordersCollection as $order) {
-            $orderMatch = false;
-            foreach ($order->getAllItems() as $orderItem) {
-                $customProductType = Mage::getModel('catalog/product')->load($orderItem->getProductId())->getAttributeText('custom_product_type');
-                //$customProductType = Mage::getResourceModel('catalog/product')->getAttributeRawValue($orderItem->getProductId(), 'custom_product_type', $order->getStoreId());
-                if (true === $flags[$customProductType] && count($flags) == 1) {
-                    $orderMatch = true;
-                    break;
-                }else{
-                    if (false === $flags[$customProductType]) {
-                        continue 2; // if find one 'false' go to check next order
-                    }
-                    if (true === $flags[$customProductType]) {
-                        $orderMatch = true;
-                    }
-                }
-            }
-            if ($orderMatch) {
-                $matchedEmails[] = $order->getCustomerEmail();
-                $order->setInitiatorId($initiatorId);
-                if(null === $order->getPrimaryInitiatorId()){
-                    $order->setPrimaryInitiatorId($initiatorId);
-                }
-                $order->save();
-                $model = Mage::getModel('callcenter/queue');
-                try {
-                    $model->setId($queueId)->delete();
-                } catch (Exception $e){
-                    echo $e->getMessage();
-                }
-            }
-        }
-        return $matchedEmails;
     }
 }

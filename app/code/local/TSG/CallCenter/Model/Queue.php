@@ -24,21 +24,35 @@ class TSG_CallCenter_Model_Queue extends Mage_Core_Model_Abstract
         $this->_init('callcenter/queue');
     }
 
+    /**
+     * @return array
+     */
     public function getAllowedRoleNames()
     {
         return $this->_allowedRoleNames;
     }
 
+    /**
+     * @return array
+     */
     public function getProductTypes()
     {
         return $this->_productTypes;
     }
 
+    /**
+     * @return array
+     */
     public function getOrderTypes()
     {
         return $this->_orderTypes;
     }
 
+    /**
+     * Check if user is in list of allowed roles
+     * @param int $roleType
+     * @return bool
+     */
     public function isAllowedByRole($roleType = 1)
     {
         $allowed = false;
@@ -48,11 +62,20 @@ class TSG_CallCenter_Model_Queue extends Mage_Core_Model_Abstract
         return $allowed;
     }
 
+    /**
+     * Get count rows in queue by current user
+     * @return mixed
+     */
     public function getCountByUser()
     {
         return $this->getCollection()->addFieldToFilter('user_id', Mage::getSingleton('admin/session')->getUser()->getId())->count();
     }
 
+    /**
+     * Get count orders in database by current user and filter by order statuses
+     * @param array $statuses
+     * @return mixed
+     */
     public function getCountOrdersByUser(array $statuses = array('pending'))
     {
         $orders = Mage::getModel('sales/order')->getCollection()

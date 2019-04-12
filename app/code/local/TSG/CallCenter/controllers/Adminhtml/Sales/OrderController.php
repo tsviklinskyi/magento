@@ -3,6 +3,9 @@ require_once Mage::getModuleDir('controllers', 'Mage_Adminhtml').DS.'Sales'.DS.'
 
 class TSG_CallCenter_Adminhtml_Sales_OrderController extends Mage_Adminhtml_Sales_OrderController
 {
+    /**
+     * Save item to waiting queue
+     */
     public function setInitiatorAction()
     {
         $model = Mage::getModel('callcenter/queue');
@@ -10,6 +13,9 @@ class TSG_CallCenter_Adminhtml_Sales_OrderController extends Mage_Adminhtml_Sale
         $this->_redirectReferer();
     }
 
+    /**
+     * Mass clear initiator of orders list
+     */
     public function clearInitiatorAction()
     {
         $orderIds = $this->getRequest()->getParam('order_ids');
@@ -25,6 +31,9 @@ class TSG_CallCenter_Adminhtml_Sales_OrderController extends Mage_Adminhtml_Sale
         $this->_redirectReferer();
     }
 
+    /**
+     * View order details and save initiator if it allowed
+     */
     public function viewAction()
     {
         $this->_title($this->__('Sales'))->_title($this->__('Orders'));

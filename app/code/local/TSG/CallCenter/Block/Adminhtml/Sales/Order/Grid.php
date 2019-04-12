@@ -1,6 +1,9 @@
 <?php
 class TSG_CallCenter_Block_Adminhtml_Sales_Order_Grid extends Mage_Adminhtml_Block_Sales_Order_Grid
 {
+    /**
+     * @return $this|Mage_Adminhtml_Block_Sales_Order_Grid|Mage_Adminhtml_Block_Widget_Grid
+     */
     protected function _prepareMassaction()
     {
         parent::_prepareMassaction();

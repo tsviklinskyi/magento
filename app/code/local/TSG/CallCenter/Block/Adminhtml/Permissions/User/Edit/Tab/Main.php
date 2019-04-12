@@ -1,6 +1,9 @@
 <?php
 class TSG_CallCenter_Block_Adminhtml_Permissions_User_Edit_Tab_Main extends Mage_Adminhtml_Block_Permissions_User_Edit_Tab_Main
 {
+    /**
+     * @return $this|Mage_Adminhtml_Block_Widget_Form
+     */
     protected function _prepareForm()
     {
         $model = Mage::registry('permissions_user');
