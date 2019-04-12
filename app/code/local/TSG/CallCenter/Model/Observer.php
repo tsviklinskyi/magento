@@ -33,9 +33,9 @@ class TSG_CallCenter_Model_Observer
     {
         $modelQueue = Mage::getModel('callcenter/queue');
         if ($modelQueue->isAllowedByRole()) {
-            $collection->addAttributeToFilter('sales_flat_order.initiator_id', Mage::getSingleton('admin/session')->getUser()->getUserId());
+            $collection->addAttributeToFilter('sfu.initiator_id', Mage::getSingleton('admin/session')->getUser()->getUserId());
         }elseif ($modelQueue->isAllowedByRole(2)) {
-            $collection->addAttributeToFilter('sales_flat_order.initiator_id', array('notnull' => true));
+            $collection->addAttributeToFilter('sfu.initiator_id', array('notnull' => true));
         }
     }
 
