@@ -6,18 +6,25 @@ class TSG_CallCenter_Model_Observer
         $collection = $observer->getOrderGridCollection();
         $select = $collection->getSelect();
         $select->joinLeft(
-            array('sales_flat_order'),
-            'sales_flat_order.entity_id = main_table.entity_id',
+            array('sfu' => 'sales_flat_order'),
+            'sfu.entity_id = main_table.entity_id',
             array('customer_email', 'initiator_id', 'primary_initiator_id')
         );
         $select->joinLeft(
-            array('admin_user'),
-            'admin_user.user_id = sales_flat_order.initiator_id',
+            array('au' => 'admin_user'),
+            'au.user_id = sfu.initiator_id',
             array(
-                'initiator_name' => 'CONCAT(admin_user.firstname, " ", admin_user.lastname)',
-                'primary_initiator_name' => 'CONCAT(admin_user.firstname, " ", admin_user.lastname)'
+                'initiator_name' => 'CONCAT(au.firstname, " ", au.lastname)'
             )
         );
+        $select->joinLeft(
+            array('au2' => 'admin_user'),
+            'au2.user_id = sfu.primary_initiator_id',
+            array(
+                'primary_initiator_name' => 'CONCAT(au2.firstname, " ", au2.lastname)'
+            )
+        );
+        $select->group('sfu.entity_id');
 
         $this->_filterCollectionByRole($collection);
     }

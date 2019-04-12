@@ -7,7 +7,7 @@
                 <arguments>
                     <header>Customer e-mail</header>
                     <index>customer_email</index>
-                    <filter_index>customer_email</filter_index>
+                    <filter_index>sfu.customer_email</filter_index>
                     <type>text</type>
                 </arguments>
                 <after>shipping_name</after>
@@ -17,7 +17,7 @@
                 <arguments>
                     <header>Initiator</header>
                     <index>initiator_name</index>
-                    <filter_index>admin_user.firstname</filter_index>
+                    <filter_index>au.firstname</filter_index>
                     <type>text</type>
                 </arguments>
                 <after>customer_email</after>
@@ -27,7 +27,7 @@
                 <arguments>
                     <header>Primary initiator</header>
                     <index>primary_initiator_name</index>
-                    <filter_index>admin_user.firstname</filter_index>
+                    <filter_index>au2.firstname</filter_index>
                     <type>text</type>
                 </arguments>
                 <after>initiator_name</after>
