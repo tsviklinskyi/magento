@@ -22,13 +22,9 @@ class TSG_CallCenter_Adminhtml_CallCenter_InitiatorController extends Mage_Admin
         }
         if (!empty($orderIds)) {
             $modelOrder = Mage::getModel('sales/order');
-            $modelOrderGrid = Mage::getModel('sales/order_grid');
             $orders = $modelOrder->getCollection()
                 ->addFieldToFilter('entity_id', array('in' => $orderIds));
-            $orderGridItems = $modelOrderGrid->getCollection()
-                ->addFieldToFilter('entity_id', array('in' => $orderIds));
             $orders->setDataToAll('initiator_id', null)->save();
-            $orderGridItems->setDataToAll('initiator_id', null)->save();
         }
         $this->_redirectReferer();
     }
