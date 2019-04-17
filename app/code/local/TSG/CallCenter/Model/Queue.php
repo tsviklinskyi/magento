@@ -83,4 +83,37 @@ class TSG_CallCenter_Model_Queue extends Mage_Core_Model_Abstract
             ->addFieldToFilter('initiator_id', Mage::getSingleton('admin/session')->getUser()->getId());
         return $orders->count();
     }
+
+    /**
+     * @param $initiatorId
+     * @param $orderIds
+     * @param $queueIdToClear
+     * @throws Exception
+     */
+    public function saveInitiatorToOrders($initiatorId, $orderIds, $queueIdToClear)
+    {
+        if (empty($orderIds)) {
+            return;
+        }
+        $modelOrder = Mage::getModel('sales/order');
+        $ordersCollection = $modelOrder->getCollection();
+        $ordersCollection->addFieldToFilter('entity_id', array('in' => $this->orderIds));
+        foreach ($ordersCollection as $order) {
+            $orderGridItem = Mage::getModel('sales/order_grid')->load($order->getId());
+            $order->setInitiatorId($initiatorId);
+            $orderGridItem->setInitiatorId($initiatorId);
+            if(null === $order->getPrimaryInitiatorId()){
+                $order->setPrimaryInitiatorId($initiatorId);
+                $orderGridItem->setPrimaryInitiatorId($initiatorId);
+            }
+            $order->save();
+            $orderGridItem->save();
+        }
+        $model = Mage::getModel('callcenter/queue');
+        try {
+            $model->setId($queueIdToClear)->delete();
+        } catch (Exception $e){
+            echo $e->getMessage();
+        }
+    }
 }

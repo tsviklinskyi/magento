@@ -2,7 +2,7 @@
 <config>
     <modules>
         <TSG_CallCenter>
-            <version>0.0.5</version>
+            <version>0.0.6</version>
         </TSG_CallCenter>
     </modules>
     <global>
@@ -31,8 +31,6 @@
         <blocks>
             <adminhtml>
                 <rewrite>
-                    <sales_order_grid>TSG_CallCenter_Block_Adminhtml_Sales_Order_Grid</sales_order_grid>
-                    <permissions_user_edit_tab_main>TSG_CallCenter_Block_Adminhtml_Permissions_User_Edit_Tab_Main</permissions_user_edit_tab_main>
                     <widget_grid_column_filter_text>TSG_CallCenter_Block_Adminhtml_Widget_Grid_Column_Filter_Text</widget_grid_column_filter_text>
                 </rewrite>
             </adminhtml>
@@ -80,6 +78,33 @@
                     </add_buttons>
                 </observers>
             </adminhtml_widget_container_html_before>
+            <core_block_abstract_prepare_layout_before>
+                <observers>
+                    <add_mass_action>
+                        <type>singleton</type>
+                        <class>TSG_CallCenter_Model_Observer</class>
+                        <method>addMassAction</method>
+                    </add_mass_action>
+                </observers>
+            </core_block_abstract_prepare_layout_before>
+            <controller_action_postdispatch_adminhtml_sales_order_view>
+                <observers>
+                    <add_mass_action>
+                        <type>singleton</type>
+                        <class>TSG_CallCenter_Model_Observer</class>
+                        <method>saveInitiatorToOrder</method>
+                    </add_mass_action>
+                </observers>
+            </controller_action_postdispatch_adminhtml_sales_order_view>
+            <adminhtml_block_html_before>
+                <observers>
+                    <add_mass_action>
+                        <type>singleton</type>
+                        <class>TSG_CallCenter_Model_Observer</class>
+                        <method>onAdminhtmlBlockHtmlBefore</method>
+                    </add_mass_action>
+                </observers>
+            </adminhtml_block_html_before>
         </events>
     </adminhtml>
     <crontab>

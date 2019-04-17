@@ -7,7 +7,7 @@
                 <arguments>
                     <header>Customer e-mail</header>
                     <index>customer_email</index>
-                    <filter_index>sfu.customer_email</filter_index>
+                    <filter_index>customer_email</filter_index>
                     <type>text</type>
                 </arguments>
                 <after>shipping_name</after>

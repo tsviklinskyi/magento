@@ -11,25 +11,20 @@ class TSG_CallCenter_Model_Observer
         $collection = $observer->getOrderGridCollection();
         $select = $collection->getSelect();
         $select->joinLeft(
-            array('sfu' => 'sales_flat_order'),
-            'sfu.entity_id = main_table.entity_id',
-            array('customer_email', 'initiator_id', 'primary_initiator_id')
-        );
-        $select->joinLeft(
             array('au' => 'admin_user'),
-            'au.user_id = sfu.initiator_id',
+            'au.user_id = main_table.initiator_id',
             array(
                 'initiator_name' => 'CONCAT(au.firstname, " ", au.lastname)'
             )
         );
         $select->joinLeft(
             array('au2' => 'admin_user'),
-            'au2.user_id = sfu.primary_initiator_id',
+            'au2.user_id = main_table.primary_initiator_id',
             array(
                 'primary_initiator_name' => 'CONCAT(au2.firstname, " ", au2.lastname)'
             )
         );
-        $select->group('sfu.entity_id');
+        $select->group('main_table.entity_id');
 
         $this->_filterCollectionByRole($collection);
         return $this;
@@ -43,9 +38,9 @@ class TSG_CallCenter_Model_Observer
     {
         $modelQueue = Mage::getModel('callcenter/queue');
         if ($modelQueue->isAllowedByRole()) {
-            $collection->addAttributeToFilter('sfu.initiator_id', Mage::getSingleton('admin/session')->getUser()->getUserId());
+            $collection->addAttributeToFilter('initiator_id', Mage::getSingleton('admin/session')->getUser()->getUserId());
         }elseif ($modelQueue->isAllowedByRole(2)) {
-            $collection->addAttributeToFilter('sfu.initiator_id', array('notnull' => true));
+            $collection->addAttributeToFilter('initiator_id', array('notnull' => true));
         }
     }
 
@@ -68,7 +63,7 @@ class TSG_CallCenter_Model_Observer
                 $data = array(
                     'label'     => 'Get order',
                     'class'     => '',
-                    'onclick'   => 'setLocation(\''  . Mage::helper('adminhtml')->getUrl('adminhtml/sales_order/setInitiator') . '\')'
+                    'onclick'   => 'setLocation(\''  . Mage::helper('adminhtml')->getUrl('adminhtml/callcenter_initiator/setInitiator') . '\')'
                 );
             }
             $container->addButton('get-order', $data);
@@ -79,7 +74,7 @@ class TSG_CallCenter_Model_Observer
             $data = array(
                 'label'     => 'Clear Initiator',
                 'class'     => '',
-                'onclick'   => 'setLocation(\''  . Mage::helper('adminhtml')->getUrl('adminhtml/sales_order/clearInitiator', array('order_id' => $order->getId())) . '\')'
+                'onclick'   => 'setLocation(\''  . Mage::helper('adminhtml')->getUrl('adminhtml/callcenter_initiator/clearInitiator', array('order_id' => $order->getId())) . '\')'
             );
             $container->addButton('clear-initiator', $data);
         }
@@ -95,31 +90,77 @@ class TSG_CallCenter_Model_Observer
         Mage::log('TSG CallCenter queueDistribution was run at ' . date('Y-m-d H:i:s'), null, 'tsg_callcenter_queue.log', true);
         $modelQueue = Mage::getModel('callcenter/queue');
         $collectionQueue = $modelQueue->getCollection()->setOrder('request_date', 'ASC');
-        foreach ($collectionQueue as $itemQueue){
-            $userData = Mage::getModel('admin/user')->load($itemQueue->getUserId())->getData();
-            $productsCriteria = Mage::helper('callcenter')->generateProductsCriteria($userData['products_type']);
-            $modelOrder = Mage::getModel('sales/order');
-            $ordersCollection = $modelOrder->getCollection();
-            $ordersCollection->addFieldToFilter('initiator_id', array('null' => true));
-            //$ordersCollection->addFieldToFilter('entity_id', array('eq' => 195));
-            switch ($userData['orders_type']){
-                case 1:
-                    $ordersCollection->addFieldToFilter('created_at', Mage::helper('callcenter')->getTimeRangeArray(20,8));
-                    break;
-                case 2:
-                    $ordersCollection->addFieldToFilter('created_at', Mage::helper('callcenter')->getTimeRangeArray(8,20));
-                    break;
-                default:
-                    // do nothing
-                    break;
-            }
-            $ordersCollection2 = clone $ordersCollection;
-            $matchedEmails = Mage::helper('callcenter')->checkCollectionAndSaveRelations($ordersCollection, $productsCriteria, $itemQueue->getUserId(), $itemQueue->getId());
-            if (!empty($matchedEmails)) {
-                $ordersCollection2->addFieldToFilter('customer_email', array('in' => $matchedEmails));
-                Mage::helper('callcenter')->checkCollectionAndSaveRelations($ordersCollection2, $productsCriteria, $itemQueue->getUserId(), $itemQueue->getId());
-            }
-        }
+        Mage::helper('callcenter')->queueDistribution($collectionQueue);
         Mage::log('TSG CallCenter queueDistribution finished at ' . date('Y-m-d H:i:s'), null, 'tsg_callcenter_queue.log', true);
+    }
+
+    /**
+     * @param $observer
+     * @throws Mage_Core_Model_Store_Exception
+     */
+    public function addMassAction($observer) {
+        $block = $observer->getEvent()->getBlock();
+        if (get_class($block) =='Mage_Adminhtml_Block_Widget_Grid_Massaction'
+            && $block->getRequest()->getControllerName() == 'sales_order'
+            && Mage::getModel('callcenter/queue')->isAllowedByRole(2)
+        ) {
+            $block->addItem('clear_initiator', array(
+                'label' => Mage::helper('sales')->__('Clear Initiator'),
+                'url' => Mage::app()->getStore()->getUrl('*/callcenter_initiator/clearInitiator'),
+            ));
+        }
+    }
+
+    /**
+     * @param $observer
+     * @throws Exception
+     */
+    public function saveInitiatorToOrder($observer)
+    {
+        $id = Mage::app()->getRequest()->getParam('order_id');
+        $order = Mage::getModel('sales/order')->load($id);
+        if (Mage::getModel('callcenter/queue')->isAllowedByRole()) {
+            $userId = Mage::getSingleton('admin/session')->getUser()->getId();
+            $orderGridItem = Mage::getModel('sales/order_grid')->load($order->getId());
+            $order->setInitiatorId($userId);
+            $orderGridItem->setInitiatorId($userId);
+            if(null === $order->getPrimaryInitiatorId()){
+                $order->setPrimaryInitiatorId($userId);
+                $orderGridItem->setPrimaryInitiatorId($userId);
+            }
+            $order->save();
+            $orderGridItem->save();
+        }
+    }
+
+    /**
+     * @param $observer
+     */
+    public function onAdminhtmlBlockHtmlBefore($observer)
+    {
+        $block = $observer->getBlock();
+        if (!isset($block)) return;
+
+        switch ($block->getType()) {
+            case 'adminhtml/permissions_user_edit_tab_main':
+                $model = Mage::registry('permissions_user');
+                $form = $block->getForm();
+                $fieldset = $form->getElement('base_fieldset');
+                $fieldset->addField('orders_type', 'select', array(
+                    'label'     => Mage::helper('adminhtml')->__('Orders type'),
+                    'class'     => 'input-select',
+                    'name'      => 'orders_type',
+                    'options'   => Mage::getModel('callcenter/queue')->getOrderTypes(),
+                    'value'     => $model->getData('orders_type')
+                ));
+                $fieldset->addField('products_type', 'select', array(
+                    'label'     => Mage::helper('adminhtml')->__('Products type'),
+                    'class'     => 'input-select',
+                    'name'      => 'products_type',
+                    'options'   => Mage::getModel('callcenter/queue')->getProductTypes(),
+                    'value'     => $model->getData('products_type'),
+                ));
+                break;
+        }
     }
 }
