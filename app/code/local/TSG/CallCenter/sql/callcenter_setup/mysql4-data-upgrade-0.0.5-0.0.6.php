@@ -3,6 +3,7 @@ $installer = $this;
 
 $installer->startSetup();
 
+/* @var Mage_Sales_Model_Order $modelOrder */
 $modelOrder = Mage::getModel('sales/order');
 $ordersCollection = $modelOrder->getCollection();
 foreach ($ordersCollection as $order) {

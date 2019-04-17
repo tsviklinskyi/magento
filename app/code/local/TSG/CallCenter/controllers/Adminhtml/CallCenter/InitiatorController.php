@@ -4,10 +4,11 @@ class TSG_CallCenter_Adminhtml_CallCenter_InitiatorController extends Mage_Admin
     /**
      * Save item to waiting queue
      */
-    public function setInitiatorAction()
+    public function addToQueueAction()
     {
-        $model = Mage::getModel('callcenter/queue');
-        $model->setUserId(Mage::getSingleton('admin/session')->getUser()->getId())->save();
+        /* @var TSG_CallCenter_Model_Queue $callcenterQueue */
+        $callcenterQueue = Mage::getModel('callcenter/queue');
+        $callcenterQueue->setUserId(Mage::getSingleton('admin/session')->getUser()->getId())->save();
         $this->_redirectReferer();
     }
 
@@ -21,6 +22,7 @@ class TSG_CallCenter_Adminhtml_CallCenter_InitiatorController extends Mage_Admin
             $orderIds = array($orderId);
         }
         if (!empty($orderIds)) {
+            /* @var Mage_Sales_Model_Order $modelOrder */
             $modelOrder = Mage::getModel('sales/order');
             $orders = $modelOrder->getCollection()
                 ->addFieldToFilter('entity_id', array('in' => $orderIds));

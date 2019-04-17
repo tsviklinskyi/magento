@@ -18,13 +18,14 @@ class TSG_CallCenter_Helper_Data extends Mage_Core_Helper_Abstract
      * @return array
      * @throws Exception
      */
-    public function generateDataByQueue($collectionQueue)
+    public function generateDataByQueue(TSG_CallCenter_Model_Resource_Queue_Collection $collectionQueue) : array
     {
         $this->_queueData = array();
         foreach ($collectionQueue as $itemQueue){
             $this->_orderIds = array();
             $userData = Mage::getModel('admin/user')->load($itemQueue->getUserId())->getData();
             $productsCriteria = Mage::helper('callcenter')->generateProductsCriteria($userData['products_type']);
+            /* @var Mage_Sales_Model_Order $modelOrder */
             $modelOrder = Mage::getModel('sales/order');
             $ordersCollection = $modelOrder->getCollection();
             $ordersCollection->addFieldToFilter('initiator_id', array('null' => true));
@@ -49,8 +50,9 @@ class TSG_CallCenter_Helper_Data extends Mage_Core_Helper_Abstract
             }
             if (!empty($this->_orderIds)) {
                 $this->_queueData[$itemQueue->getUserId()] = $this->_orderIds;
-                $queue = Mage::getModel('callcenter/queue');
-                $queue->setId($itemQueue->getId())->delete();
+                /* @var TSG_CallCenter_Model_Queue $callcenterQueue */
+                $callcenterQueue = Mage::getModel('callcenter/queue');
+                $callcenterQueue->setId($itemQueue->getId())->delete();
             }
         }
         return $this->_queueData;
@@ -63,7 +65,7 @@ class TSG_CallCenter_Helper_Data extends Mage_Core_Helper_Abstract
      * @param $to
      * @return array
      */
-    public function timeRangeArray($from, $to)
+    public function timeRangeArray(int $from, int $to) : array
     {
         $arr = array();
         $n = $to;
@@ -71,12 +73,12 @@ class TSG_CallCenter_Helper_Data extends Mage_Core_Helper_Abstract
             $n = $from + 23;
         }
         for($i = $from; $i < $n; $i++){
-            if($i == 24){
+            if($i === 24){
                 $i = 0;
                 $n = $to;
             }
             $like = $i;
-            if(strlen($like) == 1){
+            if(strlen($like) === 1){
                 $like = '0' . $like;
             }
             $arr[] = array('like' => '% '.$like.':%');
@@ -90,34 +92,36 @@ class TSG_CallCenter_Helper_Data extends Mage_Core_Helper_Abstract
      * @param $productsType
      * @return array
      */
-    public function generateProductsCriteria($productsType)
+    public function generateProductsCriteria(string $productsType) : array
     {
         $criteria = array();
+        /* @var TSG_CallCenter_Model_Queue $callcenterQueue */
+        $callcenterQueue = Mage::getModel('callcenter/queue');
         switch ($productsType){
             case '1':
                 $criteria = array(
-                    Mage::getModel('callcenter/queue')->getProductTypes()['1'] => true
+                    $callcenterQueue->getProductTypes()['1'] => true
                 );
                 break;
             case '2':
                 $criteria = array(
-                    Mage::getModel('callcenter/queue')->getProductTypes()['1'] => false,
-                    Mage::getModel('callcenter/queue')->getProductTypes()['2'] => true
+                    $callcenterQueue->getProductTypes()['1'] => false,
+                    $callcenterQueue->getProductTypes()['2'] => true
                 );
                 break;
             case '3':
                 $criteria = array(
-                    Mage::getModel('callcenter/queue')->getProductTypes()['1'] => false,
-                    Mage::getModel('callcenter/queue')->getProductTypes()['2'] => false,
-                    Mage::getModel('callcenter/queue')->getProductTypes()['3'] => true
+                    $callcenterQueue->getProductTypes()['1'] => false,
+                    $callcenterQueue->getProductTypes()['2'] => false,
+                    $callcenterQueue->getProductTypes()['3'] => true
                 );
                 break;
             case '0':
                 $criteria = array(
-                    Mage::getModel('callcenter/queue')->getProductTypes()['1'] => false,
-                    Mage::getModel('callcenter/queue')->getProductTypes()['2'] => false,
-                    Mage::getModel('callcenter/queue')->getProductTypes()['3'] => false,
-                    Mage::getModel('callcenter/queue')->getProductTypes()['0'] => true
+                    $callcenterQueue->getProductTypes()['1'] => false,
+                    $callcenterQueue->getProductTypes()['2'] => false,
+                    $callcenterQueue->getProductTypes()['3'] => false,
+                    $callcenterQueue->getProductTypes()['0'] => true
                 );
                 break;
             default:
@@ -132,11 +136,9 @@ class TSG_CallCenter_Helper_Data extends Mage_Core_Helper_Abstract
      *
      * @param $ordersCollection
      * @param $productsCriteria
-     * @param $initiatorId
-     * @param $queueId
      * @return array
      */
-    public function checkCollection($ordersCollection, $productsCriteria)
+    public function checkCollection($ordersCollection, array $productsCriteria)
     {
         $matchedEmails = array();
         foreach ($ordersCollection as $order) {
@@ -144,7 +146,7 @@ class TSG_CallCenter_Helper_Data extends Mage_Core_Helper_Abstract
             foreach ($order->getAllItems() as $orderItem) {
                 $customProductType = Mage::getModel('catalog/product')->load($orderItem->getProductId())->getAttributeText('custom_product_type');
                 //$customProductType = Mage::getResourceModel('catalog/product')->getAttributeRawValue($orderItem->getProductId(), 'custom_product_type', $order->getStoreId());
-                if (true === $productsCriteria[$customProductType] && count($productsCriteria) == 1) {
+                if (true === $productsCriteria[$customProductType] && count($productsCriteria) === 1) {
                     $orderMatch = true;
                     break;
                 }else{

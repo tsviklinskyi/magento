@@ -6,7 +6,9 @@ class TSG_CallCenter_Block_Adminhtml_Widget_Grid_Column_Filter_Text extends Mage
      */
     public function getCondition()
     {
-        if ($this->getColumn()->getIndex() == 'customer_email' && Mage::getModel('callcenter/queue')->isAllowedByRole()) {
+        /* @var TSG_CallCenter_Model_Queue $callcenterQueue */
+        $callcenterQueue = Mage::getModel('callcenter/queue');
+        if ($this->getColumn()->getIndex() === 'customer_email' && $callcenterQueue->isAllowedByRole()) {
             return array('eq' => $this->getValue());
         }else{
             return parent::getCondition();

@@ -14,9 +14,10 @@ class TSG_CallCenter_Model_Observer_Block_Widget_Modifier
 
         switch ($block->getType()) {
             case 'adminhtml/sales_order':
-                $modelQueue = Mage::getModel('callcenter/queue');
-                if ($modelQueue->isAllowedByRole() && $modelQueue->getCountOrdersByUser() == 0) {
-                    if ($modelQueue->getCountByUser()) {
+                /* @var TSG_CallCenter_Model_Queue $callcenterQueue */
+                $callcenterQueue = Mage::getModel('callcenter/queue');
+                if ($callcenterQueue->isAllowedByRole() && $callcenterQueue->getCountOrdersByUser() === 0) {
+                    if ($callcenterQueue->getCountByUser()) {
                         $data = array(
                             'label'     => 'Waiting order',
                             'class'     => 'disabled reload-page-5',
@@ -25,15 +26,16 @@ class TSG_CallCenter_Model_Observer_Block_Widget_Modifier
                         $data = array(
                             'label'     => 'Get order',
                             'class'     => '',
-                            'onclick'   => 'setLocation(\''  . Mage::helper('adminhtml')->getUrl('adminhtml/callcenter_initiator/setInitiator') . '\')'
+                            'onclick'   => 'setLocation(\''  . Mage::helper('adminhtml')->getUrl('adminhtml/callcenter_initiator/addToQueue') . '\')'
                         );
                     }
                     $block->addButton('get-order', $data);
                 }
                 break;
             case 'adminhtml/sales_order_view':
-                $modelQueue = Mage::getModel('callcenter/queue');
-                if($modelQueue->isAllowedByRole(2)) {
+                /* @var TSG_CallCenter_Model_Queue $callcenterQueue */
+                $callcenterQueue = Mage::getModel('callcenter/queue');
+                if($callcenterQueue->isAllowedByRole(2)) {
                     $order = Mage::registry('current_order');
                     $data = array(
                         'label'     => 'Clear Initiator',
@@ -54,9 +56,11 @@ class TSG_CallCenter_Model_Observer_Block_Widget_Modifier
      */
     public function addMassAction(Varien_Event_Observer $observer) {
         $block = $observer->getBlock();
-        if (get_class($block) == 'Mage_Adminhtml_Block_Widget_Grid_Massaction'
-            && $block->getRequest()->getControllerName() == 'sales_order'
-            && Mage::getModel('callcenter/queue')->isAllowedByRole(2)
+        /* @var TSG_CallCenter_Model_Queue $callcenterQueue */
+        $callcenterQueue = Mage::getModel('callcenter/queue');
+        if (get_class($block) === 'Mage_Adminhtml_Block_Widget_Grid_Massaction'
+            && $block->getRequest()->getControllerName() === 'sales_order'
+            && $callcenterQueue->isAllowedByRole(2)
         ) {
             $block->addItem('clear_initiator', array(
                 'label' => Mage::helper('sales')->__('Clear Initiator'),

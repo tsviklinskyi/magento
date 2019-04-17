@@ -95,6 +95,7 @@ class TSG_CallCenter_Model_Queue extends Mage_Core_Model_Abstract
         if (empty($orderIds)) {
             return;
         }
+        /* @var Mage_Sales_Model_Order $modelOrder */
         $modelOrder = Mage::getModel('sales/order');
         $ordersCollection = $modelOrder->getCollection();
         $ordersCollection->addFieldToFilter('entity_id', array('in' => $orderIds));

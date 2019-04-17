@@ -7,7 +7,7 @@ class TSG_CallCenter_Model_Observer_Sales_Order_Grid_Columns_Modifier
      * @param Varien_Event_Observer $observer
      * @return $this
      */
-    public function salesOrderGridCollectionLoadBefore(Varien_Event_Observer $observer)
+    public function updateCollectionBeforeLoad(Varien_Event_Observer $observer)
     {
         $collection = $observer->getOrderGridCollection();
         $select = $collection->getSelect();
@@ -38,10 +38,11 @@ class TSG_CallCenter_Model_Observer_Sales_Order_Grid_Columns_Modifier
      */
     private function _filterCollectionByRole($collection)
     {
-        $modelQueue = Mage::getModel('callcenter/queue');
-        if ($modelQueue->isAllowedByRole()) {
+        /* @var TSG_CallCenter_Model_Queue $callcenterQueue */
+        $callcenterQueue = Mage::getModel('callcenter/queue');
+        if ($callcenterQueue->isAllowedByRole()) {
             $collection->addAttributeToFilter('initiator_id', Mage::getSingleton('admin/session')->getUser()->getUserId());
-        }elseif ($modelQueue->isAllowedByRole(2)) {
+        }elseif ($callcenterQueue->isAllowedByRole(2)) {
             $collection->addAttributeToFilter('initiator_id', array('notnull' => true));
         }
     }

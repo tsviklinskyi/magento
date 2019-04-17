@@ -65,7 +65,7 @@
                 <observers>
                     <extendedgrid>
                         <model>TSG_CallCenter_Model_Observer_Sales_Order_Grid_Columns_Modifier</model>
-                        <method>salesOrderGridCollectionLoadBefore</method>
+                        <method>updateCollectionBeforeLoad</method>
                     </extendedgrid>
                 </observers>
             </sales_order_grid_collection_load_before>
