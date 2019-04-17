@@ -90,9 +90,9 @@ class TSG_CallCenter_Model_Queue extends Mage_Core_Model_Abstract
      * @param $queueIdToClear
      * @throws Exception
      */
-    public function saveInitiatorToOrders($initiatorId, array $orderIds, $queueIdToClear = null, $checkAllowByCurrentUser = false)
+    public function saveInitiatorToOrders($initiatorId, array $orderIds, $queueIdToClear = null)
     {
-        if (empty($orderIds) || ($checkAllowByCurrentUser && !Mage::getModel('callcenter/queue')->isAllowedByRole())) {
+        if (empty($orderIds)) {
             return;
         }
         $modelOrder = Mage::getModel('sales/order');

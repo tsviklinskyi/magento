@@ -64,7 +64,7 @@
             <sales_order_grid_collection_load_before>
                 <observers>
                     <extendedgrid>
-                        <model>TSG_CallCenter_Model_Observer</model>
+                        <model>TSG_CallCenter_Model_Observer_Sales_Order_Grid_Columns_Modifier</model>
                         <method>salesOrderGridCollectionLoadBefore</method>
                     </extendedgrid>
                 </observers>
@@ -73,7 +73,7 @@
                 <observers>
                     <add_buttons>
                         <type>singleton</type>
-                        <class>TSG_CallCenter_Model_Observer</class>
+                        <class>TSG_CallCenter_Model_Observer_Block_Widget_Modifier</class>
                         <method>addNewButtons</method>
                     </add_buttons>
                 </observers>
@@ -82,7 +82,7 @@
                 <observers>
                     <add_mass_action>
                         <type>singleton</type>
-                        <class>TSG_CallCenter_Model_Observer</class>
+                        <class>TSG_CallCenter_Model_Observer_Block_Widget_Modifier</class>
                         <method>addMassAction</method>
                     </add_mass_action>
                 </observers>
@@ -91,7 +91,7 @@
                 <observers>
                     <add_mass_action>
                         <type>singleton</type>
-                        <class>TSG_CallCenter_Model_Observer</class>
+                        <class>TSG_CallCenter_Model_Observer_Sales_Order_View_Postdispatch</class>
                         <method>saveInitiatorToOrder</method>
                     </add_mass_action>
                 </observers>
@@ -100,7 +100,7 @@
                 <observers>
                     <add_mass_action>
                         <type>singleton</type>
-                        <class>TSG_CallCenter_Model_Observer</class>
+                        <class>TSG_CallCenter_Model_Observer_Form_Permissions_User_Modifier</class>
                         <method>onAdminhtmlBlockHtmlBefore</method>
                     </add_mass_action>
                 </observers>
@@ -114,7 +114,7 @@
                     <cron_expr>* * * * *</cron_expr>
                 </schedule>
                 <run>
-                    <model>callcenter/observer::queueDistribution</model>
+                    <model>callcenter/observer_queue_handler::queueDistribution</model>
                 </run>
             </queue_distribution>
         </jobs>
