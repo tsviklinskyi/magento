@@ -43,7 +43,8 @@ class TSG_CallCenter_Helper_Data extends Mage_Core_Helper_Abstract
             $ordersCollection2 = clone $ordersCollection;
             $matchedEmails = $this->checkCollection($ordersCollection, $productsCriteria);
             if (!empty($matchedEmails)) {
-                $ordersCollection2->addFieldToFilter('customer_email', array('in' => $matchedEmails));
+                $ordersCollection2->addFieldToFilter('customer_email', array('in' => $matchedEmails))
+                    ->addFieldToFilter('entity_id', array('nin' => $this->orderIds));
                 $this->checkCollection($ordersCollection2, $productsCriteria);
             }
             if (!empty($this->orderIds)) {
