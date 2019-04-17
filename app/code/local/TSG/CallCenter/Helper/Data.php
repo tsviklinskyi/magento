@@ -7,10 +7,20 @@ class TSG_CallCenter_Helper_Data extends Mage_Core_Helper_Abstract
     public $orderIds = array();
 
     /**
-     * Distribution queue of waiting users, save relations users with orders and clear queue
+     * @var array $queueData
      */
-    public function queueDistribution($collectionQueue)
+    public $queueData = array();
+
+    /**
+     * Generate data of relations users with orders and clear queue
+     *
+     * @param $collectionQueue
+     * @return array
+     * @throws Exception
+     */
+    public function generateDataByQueue($collectionQueue)
     {
+        $this->queueData = array();
         foreach ($collectionQueue as $itemQueue){
             $this->orderIds = array();
             $userData = Mage::getModel('admin/user')->load($itemQueue->getUserId())->getData();
@@ -31,18 +41,23 @@ class TSG_CallCenter_Helper_Data extends Mage_Core_Helper_Abstract
                     break;
             }
             $ordersCollection2 = clone $ordersCollection;
-            $matchedEmails = $this->checkCollectionAndSaveRelations($ordersCollection, $productsCriteria);
+            $matchedEmails = $this->checkCollection($ordersCollection, $productsCriteria);
             if (!empty($matchedEmails)) {
                 $ordersCollection2->addFieldToFilter('customer_email', array('in' => $matchedEmails));
-                $this->checkCollectionAndSaveRelations($ordersCollection2, $productsCriteria);
+                $this->checkCollection($ordersCollection2, $productsCriteria);
             }
-            Mage::getModel('callcenter/queue')->saveInitiatorToOrders($itemQueue->getUserId(), $this->orderIds, $itemQueue->getId());
+            if (!empty($this->orderIds)) {
+                $this->queueData[$itemQueue->getUserId()] = $this->orderIds;
+                $queue = Mage::getModel('callcenter/queue');
+                $queue->setId($itemQueue->getId())->delete();
+            }
         }
-        return true;
+        return $this->queueData;
     }
 
     /**
      * Generate array of filters by hours range
+     *
      * @param $from
      * @param $to
      * @return array
@@ -70,6 +85,7 @@ class TSG_CallCenter_Helper_Data extends Mage_Core_Helper_Abstract
 
     /**
      * Generate criteria for collection by products
+     *
      * @param $productsType
      * @return array
      */
@@ -111,14 +127,15 @@ class TSG_CallCenter_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * Collection processing and save relations users with orders and clear queue
+     * Collection processing and push matched order id to list of ids
+     *
      * @param $ordersCollection
      * @param $productsCriteria
      * @param $initiatorId
      * @param $queueId
      * @return array
      */
-    public function checkCollectionAndSaveRelations($ordersCollection, $productsCriteria)
+    public function checkCollection($ordersCollection, $productsCriteria)
     {
         $matchedEmails = array();
         foreach ($ordersCollection as $order) {

@@ -90,7 +90,7 @@ class TSG_CallCenter_Model_Queue extends Mage_Core_Model_Abstract
      * @param $queueIdToClear
      * @throws Exception
      */
-    public function saveInitiatorToOrders($initiatorId, array $orderIds, $queueIdToClear = null)
+    public function saveInitiatorToOrders($initiatorId, array $orderIds)
     {
         if (empty($orderIds)) {
             return;
@@ -104,14 +104,6 @@ class TSG_CallCenter_Model_Queue extends Mage_Core_Model_Abstract
                 $order->setPrimaryInitiatorId($initiatorId);
             }
             $order->save();
-        }
-        if (null !== $queueIdToClear) {
-            $model = Mage::getModel('callcenter/queue');
-            try {
-                $model->setId($queueIdToClear)->delete();
-            } catch (Exception $e){
-                echo $e->getMessage();
-            }
         }
     }
 }
