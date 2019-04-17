@@ -2,14 +2,14 @@
 class TSG_CallCenter_Helper_Data extends Mage_Core_Helper_Abstract
 {
     /**
-     * @var array $orderIds
+     * @var array $_orderIds
      */
-    public $orderIds = array();
+    private $_orderIds = array();
 
     /**
      * @var array $queueData
      */
-    public $queueData = array();
+    private $_queueData = array();
 
     /**
      * Generate data of relations users with orders and clear queue
@@ -20,9 +20,9 @@ class TSG_CallCenter_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function generateDataByQueue($collectionQueue)
     {
-        $this->queueData = array();
+        $this->_queueData = array();
         foreach ($collectionQueue as $itemQueue){
-            $this->orderIds = array();
+            $this->_orderIds = array();
             $userData = Mage::getModel('admin/user')->load($itemQueue->getUserId())->getData();
             $productsCriteria = Mage::helper('callcenter')->generateProductsCriteria($userData['products_type']);
             $modelOrder = Mage::getModel('sales/order');
@@ -44,16 +44,16 @@ class TSG_CallCenter_Helper_Data extends Mage_Core_Helper_Abstract
             $matchedEmails = $this->checkCollection($ordersCollection, $productsCriteria);
             if (!empty($matchedEmails)) {
                 $ordersCollection2->addFieldToFilter('customer_email', array('in' => $matchedEmails))
-                    ->addFieldToFilter('entity_id', array('nin' => $this->orderIds));
+                    ->addFieldToFilter('entity_id', array('nin' => $this->_orderIds));
                 $this->checkCollection($ordersCollection2, $productsCriteria);
             }
-            if (!empty($this->orderIds)) {
-                $this->queueData[$itemQueue->getUserId()] = $this->orderIds;
+            if (!empty($this->_orderIds)) {
+                $this->_queueData[$itemQueue->getUserId()] = $this->_orderIds;
                 $queue = Mage::getModel('callcenter/queue');
                 $queue->setId($itemQueue->getId())->delete();
             }
         }
-        return $this->queueData;
+        return $this->_queueData;
     }
 
     /**
@@ -157,7 +157,7 @@ class TSG_CallCenter_Helper_Data extends Mage_Core_Helper_Abstract
                 }
             }
             if ($orderMatch) {
-                $this->orderIds[] = $order->getId();
+                $this->_orderIds[] = $order->getId();
                 $matchedEmails[] = $order->getCustomerEmail();
             }
         }
