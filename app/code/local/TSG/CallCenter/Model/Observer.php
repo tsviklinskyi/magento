@@ -113,24 +113,12 @@ class TSG_CallCenter_Model_Observer
 
     /**
      * @param $observer
-     * @throws Exception
      */
     public function saveInitiatorToOrder($observer)
     {
-        $id = Mage::app()->getRequest()->getParam('order_id');
-        $order = Mage::getModel('sales/order')->load($id);
-        if (Mage::getModel('callcenter/queue')->isAllowedByRole()) {
-            $userId = Mage::getSingleton('admin/session')->getUser()->getId();
-            $orderGridItem = Mage::getModel('sales/order_grid')->load($order->getId());
-            $order->setInitiatorId($userId);
-            $orderGridItem->setInitiatorId($userId);
-            if(null === $order->getPrimaryInitiatorId()){
-                $order->setPrimaryInitiatorId($userId);
-                $orderGridItem->setPrimaryInitiatorId($userId);
-            }
-            $order->save();
-            $orderGridItem->save();
-        }
+        $orderId = Mage::app()->getRequest()->getParam('order_id');
+        $initiatorId = Mage::getSingleton('admin/session')->getUser()->getId();
+        Mage::getModel('callcenter/queue')->saveInitiatorToOrders($initiatorId, array($orderId), null, true);
     }
 
     /**

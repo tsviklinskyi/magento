@@ -90,14 +90,14 @@ class TSG_CallCenter_Model_Queue extends Mage_Core_Model_Abstract
      * @param $queueIdToClear
      * @throws Exception
      */
-    public function saveInitiatorToOrders($initiatorId, $orderIds, $queueIdToClear)
+    public function saveInitiatorToOrders($initiatorId, array $orderIds, $queueIdToClear = null, $checkAllowByCurrentUser = false)
     {
-        if (empty($orderIds)) {
+        if (empty($orderIds) || ($checkAllowByCurrentUser && !Mage::getModel('callcenter/queue')->isAllowedByRole())) {
             return;
         }
         $modelOrder = Mage::getModel('sales/order');
         $ordersCollection = $modelOrder->getCollection();
-        $ordersCollection->addFieldToFilter('entity_id', array('in' => $this->orderIds));
+        $ordersCollection->addFieldToFilter('entity_id', array('in' => $orderIds));
         foreach ($ordersCollection as $order) {
             $orderGridItem = Mage::getModel('sales/order_grid')->load($order->getId());
             $order->setInitiatorId($initiatorId);
@@ -109,11 +109,13 @@ class TSG_CallCenter_Model_Queue extends Mage_Core_Model_Abstract
             $order->save();
             $orderGridItem->save();
         }
-        $model = Mage::getModel('callcenter/queue');
-        try {
-            $model->setId($queueIdToClear)->delete();
-        } catch (Exception $e){
-            echo $e->getMessage();
+        if (null !== $queueIdToClear) {
+            $model = Mage::getModel('callcenter/queue');
+            try {
+                $model->setId($queueIdToClear)->delete();
+            } catch (Exception $e){
+                echo $e->getMessage();
+            }
         }
     }
 }
