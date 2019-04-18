@@ -104,11 +104,7 @@ class TSG_CallCenter_Model_Queue extends Mage_Core_Model_Abstract
         $ordersCollection = $modelOrder->getCollection();
         $ordersCollection->addFieldToFilter('entity_id', array('in' => $orderIds));
         foreach ($ordersCollection as $order) {
-            $order->setInitiatorId($initiatorId);
-            if(null === $order->getPrimaryInitiatorId()){
-                $order->setPrimaryInitiatorId($initiatorId);
-            }
-            $order->save();
+            $order->setInitiatorId($initiatorId)->save();
         }
         return $this;
     }
