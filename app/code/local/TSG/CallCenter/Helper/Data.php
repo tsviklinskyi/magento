@@ -4,12 +4,12 @@ class TSG_CallCenter_Helper_Data extends Mage_Core_Helper_Abstract
     /**
      * @var array $_orderIds
      */
-    private $_orderIds = array();
+    private $_orderIds = [];
 
     /**
      * @var array $queueData
      */
-    private $_queueData = array();
+    private $_queueData = [];
 
     /**
      * Generate data of relations users with orders and clear queue
@@ -20,11 +20,11 @@ class TSG_CallCenter_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function generateDataByQueue(TSG_CallCenter_Model_Resource_Queue_Collection $collectionQueue) : array
     {
-        $this->_queueData = array();
+        $this->_queueData = [];
         /* @var TSG_CallCenter_Helper_Data $callcenterDataHelper */
         $callcenterDataHelper = Mage::helper('callcenter');
         foreach ($collectionQueue as $itemQueue){
-            $this->_orderIds = array();
+            $this->_orderIds = [];
             $userData = Mage::getModel('admin/user')->load($itemQueue->getUserId())->getData();
             $productsCriteria = $callcenterDataHelper->generateProductsCriteria($userData['products_type']);
             /* @var Mage_Sales_Model_Order $modelOrder */
@@ -69,7 +69,7 @@ class TSG_CallCenter_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function timeRangeArray(int $from, int $to) : array
     {
-        $arr = array();
+        $arr = [];
         $n = $to;
         if ($from > $to){
             $n = $from + 23;
@@ -96,7 +96,7 @@ class TSG_CallCenter_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function generateProductsCriteria(string $productsType) : array
     {
-        $criteria = array();
+        $criteria = [];
         /* @var TSG_CallCenter_Model_Queue $callcenterQueue */
         $callcenterQueue = Mage::getModel('callcenter/queue');
         switch ($productsType){
@@ -142,7 +142,7 @@ class TSG_CallCenter_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function checkCollection($ordersCollection, array $productsCriteria) : array
     {
-        $matchedEmails = array();
+        $matchedEmails = [];
         foreach ($ordersCollection as $order) {
             $orderMatch = false;
             foreach ($order->getAllItems() as $orderItem) {

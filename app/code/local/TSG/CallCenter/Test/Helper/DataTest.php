@@ -7,7 +7,7 @@ class TSG_Callcenter_Test_Helper_DataTest extends PHPUnit_Framework_TestCase
     /** @var TSG_CallCenter_Model_Queue $_modelQueue */
     protected $_modelQueue;
 
-    public function __construct($name = null, array $data = array(), $dataName = '')
+    public function __construct($name = null, array $data = [], $dataName = '')
     {
         parent::__construct($name, $data, $dataName);
         define('MAGENTO_ROOT', getcwd());

@@ -7,7 +7,7 @@ class TSG_CallCenter_Model_Observer_Sales_Order_Grid_Columns_Modifier
      * @param Varien_Event_Observer $observer
      * @return $this
      */
-    public function updateCollectionBeforeLoad(Varien_Event_Observer $observer)
+    public function addInitiatorToCollection(Varien_Event_Observer $observer)
     {
         $collection = $observer->getOrderGridCollection();
         $select = $collection->getSelect();

@@ -7,7 +7,7 @@ class TSG_CallCenter_Model_Observer_Form_Permissions_User_Modifier
      * @param Varien_Event_Observer $observer
      * @return $this
      */
-    public function onAdminhtmlBlockHtmlBefore(Varien_Event_Observer $observer)
+    public function addFieldsToAdminUserForm(Varien_Event_Observer $observer)
     {
         $block = $observer->getBlock();
         if (!isset($block)) return $this;

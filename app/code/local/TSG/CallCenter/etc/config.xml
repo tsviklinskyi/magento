@@ -63,46 +63,46 @@
         <events>
             <sales_order_grid_collection_load_before>
                 <observers>
-                    <extendedgrid>
+                    <add_initiator_to_collection>
                         <model>TSG_CallCenter_Model_Observer_Sales_Order_Grid_Columns_Modifier</model>
-                        <method>updateCollectionBeforeLoad</method>
-                    </extendedgrid>
+                        <method>addInitiatorToCollection</method>
+                    </add_initiator_to_collection>
                 </observers>
             </sales_order_grid_collection_load_before>
             <adminhtml_widget_container_html_before>
                 <observers>
-                    <add_buttons>
+                    <sales_rder_add_initiator_buttons>
                         <type>singleton</type>
                         <class>TSG_CallCenter_Model_Observer_Block_Widget_Modifier</class>
-                        <method>addNewButtons</method>
-                    </add_buttons>
+                        <method>salesOrderAddInitiatorButtons</method>
+                    </sales_rder_add_initiator_buttons>
                 </observers>
             </adminhtml_widget_container_html_before>
             <core_block_abstract_prepare_layout_before>
                 <observers>
-                    <add_mass_action>
+                    <add_clear_initiator_mass_action>
                         <type>singleton</type>
                         <class>TSG_CallCenter_Model_Observer_Block_Widget_Modifier</class>
-                        <method>addMassAction</method>
-                    </add_mass_action>
+                        <method>addClearInitiatorMassAction</method>
+                    </add_clear_initiator_mass_action>
                 </observers>
             </core_block_abstract_prepare_layout_before>
             <controller_action_postdispatch_adminhtml_sales_order_view>
                 <observers>
-                    <add_mass_action>
+                    <save_initiator_to_order>
                         <type>singleton</type>
                         <class>TSG_CallCenter_Model_Observer_Sales_Order_View_Postdispatch</class>
                         <method>saveInitiatorToOrder</method>
-                    </add_mass_action>
+                    </save_initiator_to_order>
                 </observers>
             </controller_action_postdispatch_adminhtml_sales_order_view>
             <adminhtml_block_html_before>
                 <observers>
-                    <add_mass_action>
+                    <add_fields_to_admin_user_form>
                         <type>singleton</type>
                         <class>TSG_CallCenter_Model_Observer_Form_Permissions_User_Modifier</class>
-                        <method>onAdminhtmlBlockHtmlBefore</method>
-                    </add_mass_action>
+                        <method>addFieldsToAdminUserForm</method>
+                    </add_fields_to_admin_user_form>
                 </observers>
             </adminhtml_block_html_before>
         </events>

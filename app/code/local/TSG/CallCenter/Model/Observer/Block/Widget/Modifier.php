@@ -7,7 +7,7 @@ class TSG_CallCenter_Model_Observer_Block_Widget_Modifier
      * @param Varien_Event_Observer $observer
      * @return $this
      */
-    public function addNewButtons(Varien_Event_Observer $observer)
+    public function salesOrderAddInitiatorButtons(Varien_Event_Observer $observer)
     {
         $block = $observer->getBlock();
         if (!isset($block)) return $this;
@@ -56,7 +56,7 @@ class TSG_CallCenter_Model_Observer_Block_Widget_Modifier
      * @param Varien_Event_Observer $observer
      * @throws Mage_Core_Model_Store_Exception
      */
-    public function addMassAction(Varien_Event_Observer $observer) {
+    public function addClearInitiatorMassAction(Varien_Event_Observer $observer) {
         $block = $observer->getBlock();
         /* @var TSG_CallCenter_Model_Queue $callcenterQueue */
         $callcenterQueue = Mage::getModel('callcenter/queue');
