@@ -78,10 +78,10 @@ class TSG_Callcenter_Test_Helper_DataTest extends PHPUnit_Framework_TestCase
     public function testBinaryGap()
     {
         $str = '1000010001';
-        $this->assertEquals($this->checkBbinaryGap($str), $this->binaryGap($str));
+        $this->assertEquals($this->checkBinaryGap($str), $this->binaryGap($str));
     }
 
-    public function checkBbinaryGap($str)
+    public function checkBinaryGap($str)
     {
         $binaryGap = 0;
         switch ($str){
