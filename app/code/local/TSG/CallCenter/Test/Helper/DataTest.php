@@ -45,9 +45,9 @@ class TSG_Callcenter_Test_Helper_DataTest extends PHPUnit_Framework_TestCase
 
     public function getCollectionQueueData()
     {
-        return array(
-            $this->_modelQueue->setQueue_id(200)->setUserId(9)
-        );
+        $collectionQueue = $this->_modelQueue->getCollection();
+        $collectionQueue->addItem($this->_modelQueue->setQueue_id(200)->setUserId(9));
+        return $collectionQueue;
     }
 
     public function getResultQueueData()
