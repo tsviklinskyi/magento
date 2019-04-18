@@ -20,70 +20,109 @@ class TSG_CallCenter_Model_Observer_Queue_Handler
         /* @var TSG_CallCenter_Model_Queue $callcenterQueue */
         $callcenterQueue = Mage::getModel('callcenter/queue');
         $collectionQueue = $callcenterQueue->getCollection()->setOrder('request_date', 'ASC');
+        $select = $collectionQueue->getSelect();
+        $select->joinLeft(
+            array('au' => 'admin_user'),
+            'au.user_id = main_table.user_id',
+            array(
+                'products_type' => 'au.products_type',
+                'orders_type' => 'au.orders_type'
+            )
+        );
+
         $queueData = $this->generateDataByQueue($collectionQueue);
         foreach ($queueData as $initiatorId => $orderIds){
             $callcenterQueue->saveInitiatorToOrders((int)$initiatorId, $orderIds);
+        }
+        // Clear queue
+        foreach ($collectionQueue as $itemQueue) {
+            /* @var TSG_CallCenter_Model_Queue $callcenterQueue */
+            $callcenterQueue = Mage::getModel('callcenter/queue');
+            $callcenterQueue->setId($itemQueue->getId())->delete();
         }
         Mage::log('TSG CallCenter queueDistribution finished at ' . date('Y-m-d H:i:s'), null, 'tsg_callcenter_queue.log', true);
     }
 
     /**
-     * Generate data of relations users with orders and clear queue
+     * Generate data of relations users with orders
      *
-     * @param $collectionQueue
+     * @param TSG_CallCenter_Model_Resource_Queue_Collection $collectionQueue
      * @return array
-     * @throws Exception
      */
     public function generateDataByQueue(TSG_CallCenter_Model_Resource_Queue_Collection $collectionQueue): array
     {
         $this->queueData = [];
-        foreach ($collectionQueue as $itemQueue){
-            $this->orderIds = [];
-            $userData = Mage::getModel('admin/user')->load($itemQueue->getUserId())->getData();
-            $productsCriteria = $this->generateProductsCriteria($userData['products_type']);
-            /* @var Mage_Sales_Model_Order $modelOrder */
-            $modelOrder = Mage::getModel('sales/order');
-            $ordersCollection = $modelOrder->getCollection();
-            $ordersCollection->addFieldToFilter('initiator_id', array('null' => true));
-            //$ordersCollection->addFieldToFilter('entity_id', array('eq' => 195));
-            switch ($userData['orders_type']){
-                case 1:
-                    $ordersCollection->addFieldToFilter('created_at', Mage::helper('callcenter')->timeRangeArray(20,8));
-                    break;
-                case 2:
-                    $ordersCollection->addFieldToFilter('created_at', Mage::helper('callcenter')->timeRangeArray(8,20));
-                    break;
-                default:
-                    // do nothing
-                    break;
-            }
-            $ordersCollection2 = clone $ordersCollection;
-            $matchedEmails = $this->checkCollection($ordersCollection, $productsCriteria);
-            if (!empty($matchedEmails)) {
-                $ordersCollection2->addFieldToFilter('customer_email', array('in' => $matchedEmails))
-                    ->addFieldToFilter('entity_id', array('nin' => $this->orderIds));
-                $this->checkCollection($ordersCollection2, $productsCriteria);
-            }
-            if (!empty($this->orderIds)) {
-                $this->queueData[$itemQueue->getUserId()] = $this->orderIds;
-                /* @var TSG_CallCenter_Model_Queue $callcenterQueue */
-                $callcenterQueue = Mage::getModel('callcenter/queue');
-                $callcenterQueue->setId($itemQueue->getId())->delete();
+        /* @var Mage_Sales_Model_Order $modelOrder */
+        $modelOrder = Mage::getModel('sales/order');
+        $ordersCollection = $modelOrder->getCollection();
+        $ordersCollection->addFieldToFilter('initiator_id', array('null' => true));
+        foreach ($ordersCollection as $order) {
+            foreach ($collectionQueue as $itemQueue) {
+                $orderMatch = $this->isOrderMatch($order, $itemQueue);
+                if ($orderMatch) {
+                    if (array_key_exists($itemQueue->getUserId(), $this->queueData) === false) {
+                        $this->queueData[$itemQueue->getUserId()] = [];
+                    }
+                    $this->queueData[$itemQueue->getUserId()][] = $order->getId();
+                }
             }
         }
         return $this->queueData;
     }
 
     /**
-     * Generate array of filters by hours range
+     * Check order is match by user criteria
      *
-     * @param $from
-     * @param $to
-     * @return array
+     * @param Mage_Sales_Model_Order $order
+     * @param TSG_CallCenter_Model_Queue $itemQueue
+     * @return bool
      */
-    public function timeRangeArray(int $from, int $to): array
+    private function isOrderMatch(Mage_Sales_Model_Order $order, TSG_CallCenter_Model_Queue $itemQueue): bool
     {
-        $arr = [];
+        $orderMatch = false;
+        switch ($itemQueue->getOrdersType()){
+            case 1:
+                $orderIsMatchByTimeRange = $this->checkOrderIsMatchByTimeRange($order->getCreatedAt(), 20, 8);
+                break;
+            case 2:
+                $orderIsMatchByTimeRange = $this->checkOrderIsMatchByTimeRange($order->getCreatedAt(), 8, 20);
+                break;
+            default:
+                $orderIsMatchByTimeRange = false;
+                break;
+        }
+        if ($orderIsMatchByTimeRange === false) {
+            return false;
+        }
+        $productsCriteria = $this->generateProductsCriteria($itemQueue->getProductsType());
+        foreach ($order->getAllItems() as $orderItem) {
+            $customProductType = Mage::getModel('catalog/product')->load($orderItem->getProductId())->getAttributeText('custom_product_type');
+            //$customProductType = Mage::getResourceModel('catalog/product')->getAttributeRawValue($orderItem->getProductId(), 'custom_product_type', $order->getStoreId());
+            if (true === $productsCriteria[$customProductType] && count($productsCriteria) === 1) {
+                $orderMatch = true;
+                break;
+            }else{
+                if (false === $productsCriteria[$customProductType]) {
+                    continue; // if find one 'false' go to check next order
+                }
+                if (true === $productsCriteria[$customProductType]) {
+                    $orderMatch = true;
+                }
+            }
+        }
+        return $orderMatch;
+    }
+
+    /**
+     * Check if order creation time is match by hours range
+     *
+     * @param string $orderCreatedAt
+     * @param int $from
+     * @param int $to
+     * @return bool
+     */
+    private function checkOrderIsMatchByTimeRange(string $orderCreatedAt, int $from, int $to): bool
+    {
         $n = $to;
         if ($from > $to){
             $n = $from + 23;
@@ -97,9 +136,12 @@ class TSG_CallCenter_Model_Observer_Queue_Handler
             if(strlen($like) === 1){
                 $like = '0' . $like;
             }
-            $arr[] = array('like' => '% '.$like.':%');
+            $check = strpos($orderCreatedAt, ' ' . $like . ':');
+            if ($check !== false) {
+                return true;
+            }
         }
-        return $arr;
+        return false;
     }
 
     /**
@@ -108,7 +150,7 @@ class TSG_CallCenter_Model_Observer_Queue_Handler
      * @param $productsType
      * @return array
      */
-    public function generateProductsCriteria(string $productsType): array
+    private function generateProductsCriteria(string $productsType): array
     {
         $criteria = [];
         /* @var TSG_CallCenter_Model_Queue $callcenterQueue */
@@ -145,40 +187,5 @@ class TSG_CallCenter_Model_Observer_Queue_Handler
                 break;
         }
         return $criteria;
-    }
-
-    /**
-     * Collection processing and push matched order id to list of ids
-     *
-     * @param $ordersCollection
-     * @param $productsCriteria
-     * @return array
-     */
-    public function checkCollection(Mage_Sales_Model_Resource_Order_Collection $ordersCollection, array $productsCriteria): array
-    {
-        $matchedEmails = [];
-        foreach ($ordersCollection as $order) {
-            $orderMatch = false;
-            foreach ($order->getAllItems() as $orderItem) {
-                $customProductType = Mage::getModel('catalog/product')->load($orderItem->getProductId())->getAttributeText('custom_product_type');
-                //$customProductType = Mage::getResourceModel('catalog/product')->getAttributeRawValue($orderItem->getProductId(), 'custom_product_type', $order->getStoreId());
-                if (true === $productsCriteria[$customProductType] && count($productsCriteria) === 1) {
-                    $orderMatch = true;
-                    break;
-                }else{
-                    if (false === $productsCriteria[$customProductType]) {
-                        continue 2; // if find one 'false' go to check next order
-                    }
-                    if (true === $productsCriteria[$customProductType]) {
-                        $orderMatch = true;
-                    }
-                }
-            }
-            if ($orderMatch) {
-                $this->orderIds[] = $order->getId();
-                $matchedEmails[] = $order->getCustomerEmail();
-            }
-        }
-        return $matchedEmails;
     }
 }

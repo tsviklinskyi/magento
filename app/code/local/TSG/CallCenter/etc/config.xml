@@ -40,6 +40,17 @@
                 <class>TSG_CallCenter_Helper</class>
             </callcenter>
         </helpers>
+        <events>
+            <sales_order_save_before>
+                <observers>
+                    <save_primary_initiator>
+                        <type>singleton</type>
+                        <class>TSG_CallCenter_Model_Observer_Sales_Order</class>
+                        <method>savePrimaryInitiator</method>
+                    </save_primary_initiator>
+                </observers>
+            </sales_order_save_before>
+        </events>
     </global>
     <admin>
         <routers>
@@ -105,15 +116,6 @@
                     </add_fields_to_admin_user_form>
                 </observers>
             </adminhtml_block_html_before>
-            <sales_order_save_before>
-                <observers>
-                    <save_primary_initiator>
-                        <type>singleton</type>
-                        <class>TSG_CallCenter_Model_Observer_Sales_Order</class>
-                        <method>savePrimaryInitiator</method>
-                    </save_primary_initiator>
-                </observers>
-            </sales_order_save_before>
         </events>
     </adminhtml>
     <crontab>

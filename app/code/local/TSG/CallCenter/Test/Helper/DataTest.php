@@ -1,11 +1,11 @@
 <?php
 class TSG_Callcenter_Test_Helper_DataTest extends PHPUnit_Framework_TestCase
 {
-    /** @var TSG_CallCenter_Helper_Data $_dataHelper */
-    protected $_dataHelper;
+    /** @var TSG_CallCenter_Model_Observer_Queue_Handler $handler */
+    protected $handler;
 
     /** @var TSG_CallCenter_Model_Queue $_modelQueue */
-    protected $_modelQueue;
+    protected $modelQueue;
 
     public function __construct($name = null, array $data = [], $dataName = '')
     {
@@ -19,8 +19,8 @@ class TSG_Callcenter_Test_Helper_DataTest extends PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->_dataHelper = Mage::helper('callcenter');
-        $this->_modelQueue = Mage::getModel('callcenter/queue');
+        $this->handler = Mage::helper('callcenter');
+        $this->modelQueue = Mage::getModel('callcenter/queue');
         parent::setUp();
     }
 
@@ -34,19 +34,19 @@ class TSG_Callcenter_Test_Helper_DataTest extends PHPUnit_Framework_TestCase
     /**
      * Test that method generateDataByQueue work as expected.
      *
-     * @covers TSG_CallCenter_Helper_Data::generateDataByQueue
+     * @covers TSG_CallCenter_Model_Observer_Queue_Handler::generateDataByQueue
      */
     public function testGenerateDataByQueue()
     {
         $collectionQueue = $this->getCollectionQueueData();
-        $queueData = $this->_dataHelper->generateDataByQueue($collectionQueue);
+        $queueData = $this->handler->generateDataByQueue($collectionQueue);
         $this->assertEquals($this->getResultQueueData(), $queueData);
     }
 
     public function getCollectionQueueData()
     {
-        $collectionQueue = $this->_modelQueue->getCollection();
-        $collectionQueue->addItem($this->_modelQueue->setQueue_id(200)->setUserId(9));
+        $collectionQueue = $this->modelQueue->getCollection();
+        $collectionQueue->addItem($this->modelQueue->setQueue_id(200)->setUserId(9)->setProductsType(1)->setOrdersType(0));
         return $collectionQueue;
     }
 
