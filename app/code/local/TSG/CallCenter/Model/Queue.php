@@ -54,7 +54,7 @@ class TSG_CallCenter_Model_Queue extends Mage_Core_Model_Abstract
      * @param int $roleType
      * @return bool
      */
-    public function isAllowedByRole($roleType = 1) : bool
+    public function isAllowedByRole(int $roleType = 1): bool
     {
         $allowed = false;
         if (in_array(Mage::getSingleton('admin/session')->getUser()->getRole()->getRoleName(), $this->_allowedRoleNames[$roleType])) {
@@ -94,7 +94,7 @@ class TSG_CallCenter_Model_Queue extends Mage_Core_Model_Abstract
      * @param $orderIds
      * @return $this
      */
-    public function saveInitiatorToOrders($initiatorId, array $orderIds)
+    public function saveInitiatorToOrders(int $initiatorId, array $orderIds)
     {
         if (empty($orderIds)) {
             return $this;

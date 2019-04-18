@@ -14,7 +14,7 @@ class TSG_CallCenter_Model_Observer_Queue_Handler
         $callcenterDataHelper = Mage::helper('callcenter');
         $queueData = $callcenterDataHelper->generateDataByQueue($collectionQueue);
         foreach ($queueData as $initiatorId => $orderIds){
-            $callcenterQueue->saveInitiatorToOrders($initiatorId, $orderIds);
+            $callcenterQueue->saveInitiatorToOrders((int)$initiatorId, $orderIds);
         }
         Mage::log('TSG CallCenter queueDistribution finished at ' . date('Y-m-d H:i:s'), null, 'tsg_callcenter_queue.log', true);
     }

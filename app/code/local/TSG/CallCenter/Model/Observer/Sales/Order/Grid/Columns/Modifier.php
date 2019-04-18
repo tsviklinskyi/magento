@@ -37,7 +37,7 @@ class TSG_CallCenter_Model_Observer_Sales_Order_Grid_Columns_Modifier
      * @param $collection
      * @return $this
      */
-    private function _filterCollectionByRole($collection)
+    private function _filterCollectionByRole(Mage_Sales_Model_Resource_Order_Grid_Collection $collection)
     {
         /* @var TSG_CallCenter_Model_Queue $callcenterQueue */
         $callcenterQueue = Mage::getModel('callcenter/queue');
