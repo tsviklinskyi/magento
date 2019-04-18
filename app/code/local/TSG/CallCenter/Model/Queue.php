@@ -50,10 +50,11 @@ class TSG_CallCenter_Model_Queue extends Mage_Core_Model_Abstract
 
     /**
      * Check if user is in list of allowed roles
+     *
      * @param int $roleType
      * @return bool
      */
-    public function isAllowedByRole($roleType = 1)
+    public function isAllowedByRole($roleType = 1) : bool
     {
         $allowed = false;
         if (in_array(Mage::getSingleton('admin/session')->getUser()->getRole()->getRoleName(), $this->_allowedRoleNames[$roleType])) {
@@ -64,6 +65,7 @@ class TSG_CallCenter_Model_Queue extends Mage_Core_Model_Abstract
 
     /**
      * Get count rows in queue by current user
+     *
      * @return mixed
      */
     public function getCountByUser()
@@ -73,6 +75,7 @@ class TSG_CallCenter_Model_Queue extends Mage_Core_Model_Abstract
 
     /**
      * Get count orders in database by current user and filter by order statuses
+     *
      * @param array $statuses
      * @return mixed
      */
@@ -85,15 +88,16 @@ class TSG_CallCenter_Model_Queue extends Mage_Core_Model_Abstract
     }
 
     /**
+     * Saving initiator to orders list by order ids
+     *
      * @param $initiatorId
      * @param $orderIds
-     * @param $queueIdToClear
-     * @throws Exception
+     * @return $this
      */
     public function saveInitiatorToOrders($initiatorId, array $orderIds)
     {
         if (empty($orderIds)) {
-            return;
+            return $this;
         }
         /* @var Mage_Sales_Model_Order $modelOrder */
         $modelOrder = Mage::getModel('sales/order');
@@ -106,5 +110,6 @@ class TSG_CallCenter_Model_Queue extends Mage_Core_Model_Abstract
             }
             $order->save();
         }
+        return $this;
     }
 }

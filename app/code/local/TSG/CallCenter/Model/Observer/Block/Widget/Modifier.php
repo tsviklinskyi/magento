@@ -51,6 +51,8 @@ class TSG_CallCenter_Model_Observer_Block_Widget_Modifier
     }
 
     /**
+     * Adding new massaction to sales order page
+     *
      * @param Varien_Event_Observer $observer
      * @throws Mage_Core_Model_Store_Exception
      */

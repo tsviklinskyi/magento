@@ -21,10 +21,12 @@ class TSG_CallCenter_Helper_Data extends Mage_Core_Helper_Abstract
     public function generateDataByQueue(TSG_CallCenter_Model_Resource_Queue_Collection $collectionQueue) : array
     {
         $this->_queueData = array();
+        /* @var TSG_CallCenter_Helper_Data $callcenterDataHelper */
+        $callcenterDataHelper = Mage::helper('callcenter');
         foreach ($collectionQueue as $itemQueue){
             $this->_orderIds = array();
             $userData = Mage::getModel('admin/user')->load($itemQueue->getUserId())->getData();
-            $productsCriteria = Mage::helper('callcenter')->generateProductsCriteria($userData['products_type']);
+            $productsCriteria = $callcenterDataHelper->generateProductsCriteria($userData['products_type']);
             /* @var Mage_Sales_Model_Order $modelOrder */
             $modelOrder = Mage::getModel('sales/order');
             $ordersCollection = $modelOrder->getCollection();
@@ -138,7 +140,7 @@ class TSG_CallCenter_Helper_Data extends Mage_Core_Helper_Abstract
      * @param $productsCriteria
      * @return array
      */
-    public function checkCollection($ordersCollection, array $productsCriteria)
+    public function checkCollection($ordersCollection, array $productsCriteria) : array
     {
         $matchedEmails = array();
         foreach ($ordersCollection as $order) {

@@ -35,6 +35,7 @@ class TSG_CallCenter_Model_Observer_Sales_Order_Grid_Columns_Modifier
      * Add user role filter to collection
      *
      * @param $collection
+     * @return $this
      */
     private function _filterCollectionByRole($collection)
     {
@@ -45,5 +46,6 @@ class TSG_CallCenter_Model_Observer_Sales_Order_Grid_Columns_Modifier
         }elseif ($callcenterQueue->isAllowedByRole(2)) {
             $collection->addAttributeToFilter('initiator_id', array('notnull' => true));
         }
+        return $this;
     }
 }

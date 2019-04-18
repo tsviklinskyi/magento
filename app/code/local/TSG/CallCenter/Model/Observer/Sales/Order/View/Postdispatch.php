@@ -3,6 +3,8 @@ class TSG_CallCenter_Model_Observer_Sales_Order_View_Postdispatch
 {
     /**
      * Save initiator to order on order view page if allowed by role
+     *
+     * @return $this
      */
     public function saveInitiatorToOrder()
     {
@@ -13,5 +15,6 @@ class TSG_CallCenter_Model_Observer_Sales_Order_View_Postdispatch
         if ($callcenterQueue->isAllowedByRole()) {
             $callcenterQueue->saveInitiatorToOrders($initiatorId, array($orderId));
         }
+        return $this;
     }
 }

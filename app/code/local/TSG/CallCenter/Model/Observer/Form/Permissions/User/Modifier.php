@@ -2,7 +2,7 @@
 class TSG_CallCenter_Model_Observer_Form_Permissions_User_Modifier
 {
     /**
-     * Adding new fields to form
+     * Adding new fields to admin user permissions form
      *
      * @param Varien_Event_Observer $observer
      * @return $this
