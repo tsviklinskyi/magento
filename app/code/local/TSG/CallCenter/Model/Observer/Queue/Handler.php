@@ -35,6 +35,7 @@ class TSG_CallCenter_Model_Observer_Queue_Handler
      * Generate data of relations users with orders
      *
      * @param TSG_CallCenter_Model_Resource_Queue_Collection $collectionQueue
+     * @param Mage_Sales_Model_Resource_Order_Collection $ordersCollection
      * @return array
      */
     public function generateDataByQueue(TSG_CallCenter_Model_Resource_Queue_Collection $collectionQueue, Mage_Sales_Model_Resource_Order_Collection $ordersCollection): array
