@@ -2,11 +2,6 @@
 class TSG_CallCenter_Model_Observer_Queue_Handler
 {
     /**
-     * @var array $_orderIds
-     */
-    private $orderIds = [];
-
-    /**
      * @var array $queueData
      */
     private $queueData = [];
