@@ -19,16 +19,7 @@ class TSG_CallCenter_Model_Observer_Queue_Handler
         Mage::log('TSG CallCenter queueDistribution was run at ' . date('Y-m-d H:i:s'), null, 'tsg_callcenter_queue.log', true);
         /* @var TSG_CallCenter_Model_Queue $callcenterQueue */
         $callcenterQueue = Mage::getModel('callcenter/queue');
-        $collectionQueue = $callcenterQueue->getCollection()->setOrder('request_date', 'ASC');
-        $select = $collectionQueue->getSelect();
-        $select->joinLeft(
-            array('au' => 'admin_user'),
-            'au.user_id = main_table.user_id',
-            array(
-                'products_type' => 'au.products_type',
-                'orders_type' => 'au.orders_type'
-            )
-        );
+        $collectionQueue = $this->getQueueCollection();
 
         $queueData = $this->generateDataByQueue($collectionQueue);
         foreach ($queueData as $initiatorId => $orderIds){
@@ -52,22 +43,94 @@ class TSG_CallCenter_Model_Observer_Queue_Handler
     public function generateDataByQueue(TSG_CallCenter_Model_Resource_Queue_Collection $collectionQueue): array
     {
         $this->queueData = [];
+        $allMatchedOrderIds = [];
+        $ordersCollection = $this->getOrdersCollection();
+        foreach ($collectionQueue as $itemQueue) {
+            $userMatchedIds = [];
+            $userMatchedEmails = [];
+            foreach ($ordersCollection as $order) {
+                $orderMatch = $this->isOrderMatch($order, $itemQueue);
+                if ($orderMatch && !in_array($order->getId(), $allMatchedOrderIds)) { // if order is match and not distributed yet
+                    $userMatchedIds[] = $order->getId();
+                    $allMatchedOrderIds[] = $order->getId();
+                    if (!in_array($order->getCustomerEmail(), $userMatchedEmails)) {
+                        $userMatchedEmails[] = $order->getCustomerEmail();
+                    }
+                }
+            }
+            $matchedOrderIdsByEmails = $this->checkByEmails($itemQueue, $userMatchedEmails, $userMatchedIds);
+            if (!empty($matchedOrderIdsByEmails)) {
+                $userMatchedIds = array_unique(array_merge($userMatchedIds, $matchedOrderIdsByEmails));
+            }
+            if (!empty($userMatchedIds)) {
+                $this->queueData[$itemQueue->getUserId()] = $userMatchedIds;
+            }
+        }
+        return $this->queueData;
+    }
+
+    /**
+     * Get queue collection
+     *
+     * @return mixed
+     */
+    private function getQueueCollection()
+    {
+        /* @var TSG_CallCenter_Model_Queue $callcenterQueue */
+        $callcenterQueue = Mage::getModel('callcenter/queue');
+        $collectionQueue = $callcenterQueue->getCollection()->setOrder('request_date', 'ASC');
+        $select = $collectionQueue->getSelect();
+        $select->joinLeft(
+            array('au' => 'admin_user'),
+            'au.user_id = main_table.user_id',
+            array(
+                'products_type' => 'au.products_type',
+                'orders_type' => 'au.orders_type'
+            )
+        );
+        return $collectionQueue;
+    }
+
+    /**
+     * Get collection of orders with default empty initiator and can be filtered by not founded order ids
+     *
+     * @param array|null $notInOrderIds
+     * @return object
+     */
+    private function getOrdersCollection(array $notInOrderIds = null)
+    {
         /* @var Mage_Sales_Model_Order $modelOrder */
         $modelOrder = Mage::getModel('sales/order');
         $ordersCollection = $modelOrder->getCollection();
         $ordersCollection->addFieldToFilter('initiator_id', array('null' => true));
+        if ($notInOrderIds !== null && !empty($notInOrderIds)) {
+            $ordersCollection->addFieldToFilter('entity_id', array('nin' => $notInOrderIds));
+        }
+        return $ordersCollection;
+    }
+
+    /**
+     * Check another orders by founded emails
+     *
+     * @param TSG_CallCenter_Model_Queue $itemQueue
+     * @param array $matchedEmails
+     * @param array $notInOrderIds
+     * @return array
+     */
+    private function checkByEmails(TSG_CallCenter_Model_Queue $itemQueue, array $matchedEmails, array $notInOrderIds): array
+    {
+        $matchedOrderIds = [];
+        if (empty($matchedEmails)) {
+            return $matchedOrderIds;
+        }
+        $ordersCollection = $this->getOrdersCollection($notInOrderIds);
         foreach ($ordersCollection as $order) {
-            foreach ($collectionQueue as $itemQueue) {
-                $orderMatch = $this->isOrderMatch($order, $itemQueue);
-                if ($orderMatch) {
-                    if (array_key_exists($itemQueue->getUserId(), $this->queueData) === false) {
-                        $this->queueData[$itemQueue->getUserId()] = [];
-                    }
-                    $this->queueData[$itemQueue->getUserId()][] = $order->getId();
-                }
+            $orderMatch = $this->isOrderMatch($order, $itemQueue);
+            if ($orderMatch && !in_array($order->getId(), $matchedOrderIds)) {
+                $matchedOrderIds[] = $order->getId();
             }
         }
-        return $this->queueData;
+        return $matchedOrderIds;
     }
 
     /**
