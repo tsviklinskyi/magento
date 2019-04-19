@@ -18,7 +18,15 @@ class TSG_CallCenter_Model_Observer_Queue_Handler
         $collectionQueue = $this->getQueueCollection();
         $ordersCollection = $this->getOrdersCollection();
 
-        $queueData = $this->generateDataByQueue($collectionQueue, $ordersCollection);
+        /* @var TSG_CallCenter_Model_Adapter_Queue_Collection $adaptedQueueCollection */
+        $adaptedQueueCollection = Mage::getModel('callcenter/adapter_queue_collection');
+        $adaptedQueueCollection->adaptCollection($collectionQueue);
+
+        /* @var TSG_CallCenter_Model_Adapter_Order_Collection $adaptedOrdersCollection */
+        $adaptedOrdersCollection = Mage::getModel('callcenter/adapter_order_collection');
+        $adaptedOrdersCollection->adaptCollection($ordersCollection);
+
+        $queueData = $this->generateDataByQueue($adaptedQueueCollection, $adaptedOrdersCollection);
         foreach ($queueData as $initiatorId => $orderIds){
             $callcenterQueue->saveInitiatorToOrders((int)$initiatorId, $orderIds);
         }
@@ -34,11 +42,11 @@ class TSG_CallCenter_Model_Observer_Queue_Handler
     /**
      * Generate data of relations users with orders
      *
-     * @param TSG_CallCenter_Model_Resource_Queue_Collection $collectionQueue
-     * @param Mage_Sales_Model_Resource_Order_Collection $ordersCollection
+     * @param TSG_CallCenter_Model_Adapter_Queue_Collection $collectionQueue
+     * @param TSG_CallCenter_Model_Adapter_Order_Collection $ordersCollection
      * @return array
      */
-    public function generateDataByQueue(TSG_CallCenter_Model_Resource_Queue_Collection $collectionQueue, Mage_Sales_Model_Resource_Order_Collection $ordersCollection): array
+    public function generateDataByQueue(TSG_CallCenter_Model_Adapter_Queue_Collection $collectionQueue, TSG_CallCenter_Model_Adapter_Order_Collection $ordersCollection): array
     {
         $this->queueData = [];
         $allMatchedOrderIds = [];
@@ -105,12 +113,12 @@ class TSG_CallCenter_Model_Observer_Queue_Handler
     /**
      * Check another orders by founded emails
      *
-     * @param TSG_CallCenter_Model_Queue $itemQueue
-     * @param Mage_Sales_Model_Resource_Order_Collection $ordersCollection
+     * @param Varien_Object $itemQueue
+     * @param TSG_CallCenter_Model_Adapter_Order_Collection $ordersCollection
      * @param array $matchedEmails
      * @return array
      */
-    private function checkByEmails(TSG_CallCenter_Model_Queue $itemQueue, Mage_Sales_Model_Resource_Order_Collection $ordersCollection, array $matchedEmails): array
+    private function checkByEmails(Varien_Object $itemQueue, TSG_CallCenter_Model_Adapter_Order_Collection $ordersCollection, array $matchedEmails): array
     {
         $matchedOrderIds = [];
         if (empty($matchedEmails)) {
@@ -131,11 +139,11 @@ class TSG_CallCenter_Model_Observer_Queue_Handler
     /**
      * Check order is match by user criteria
      *
-     * @param Mage_Sales_Model_Order $order
-     * @param TSG_CallCenter_Model_Queue $itemQueue
+     * @param Varien_Object $order
+     * @param Varien_Object $itemQueue
      * @return bool
      */
-    private function isOrderMatch(Mage_Sales_Model_Order $order, TSG_CallCenter_Model_Queue $itemQueue): bool
+    private function isOrderMatch(Varien_Object $order, Varien_Object $itemQueue): bool
     {
         $orderMatch = false;
         switch ($itemQueue->getOrdersType()){
@@ -153,17 +161,15 @@ class TSG_CallCenter_Model_Observer_Queue_Handler
             return false;
         }
         $productsCriteria = $this->generateProductsCriteria($itemQueue->getProductsType());
-        foreach ($order->getAllItems() as $orderItem) {
-            $customProductType = Mage::getModel('catalog/product')->load($orderItem->getProductId())->getAttributeText('custom_product_type');
-            //$customProductType = Mage::getResourceModel('catalog/product')->getAttributeRawValue($orderItem->getProductId(), 'custom_product_type', $order->getStoreId());
-            if (true === $productsCriteria[$customProductType] && count($productsCriteria) === 1) {
+        foreach ($order->getOrderedItems() as $orderItem) {
+            if (true === $productsCriteria[$orderItem->getCustomProductType()] && count($productsCriteria) === 1) {
                 $orderMatch = true;
                 break;
             }else{
-                if (false === $productsCriteria[$customProductType]) {
+                if (false === $productsCriteria[$orderItem->getCustomProductType()]) {
                     continue; // if find one 'false' go to check next order
                 }
-                if (true === $productsCriteria[$customProductType]) {
+                if (true === $productsCriteria[$orderItem->getCustomProductType()]) {
                     $orderMatch = true;
                 }
             }
