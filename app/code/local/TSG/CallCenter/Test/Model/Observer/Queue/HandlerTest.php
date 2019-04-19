@@ -40,70 +40,145 @@ class TSG_Callcenter_Test_Model_Observer_Queue_HandlerTest extends PHPUnit_Frame
      * Test that method generateDataByQueue work as expected.
      *
      * @covers TSG_CallCenter_Model_Observer_Queue_Handler::generateDataByQueue
+     * @param $itemsQueue
+     * @param $itemsOrder
+     * @param $resultData
+     *
+     * @dataProvider provider
+     * @throws Exception
      */
-    public function testGenerateDataByQueue()
+    public function testGenerateDataByQueue($itemsQueue, $itemsOrder, $resultData)
     {
-        $collectionQueue = $this->getCollectionQueueData();
-        $collectionOrder = $this->getCollectionOrderData();
+        $collectionQueue = $this->getCollectionQueueData($itemsQueue);
+        $collectionOrder = $this->getCollectionOrderData($itemsOrder);
         $queueData = $this->handler->generateDataByQueue($collectionQueue, $collectionOrder);
-        $this->assertEquals($this->getResultQueueData(), $queueData);
+        $this->assertEquals($resultData, $queueData);
     }
 
-    private function getCollectionQueueData(): TSG_CallCenter_Model_Adapter_Queue_Collection
+    public function provider()
     {
-        $item = new Varien_Object();
-        $item->setQueueId(1);
-        $item->setUserId(9);
-        $item->setProductsType(1);
-        $item->setOrdersType(0);
+        return [
+            'one user one matched order' => [
+                [
+                    [
+                        'queue_id' => 1,
+                        'user_id' => 9,
+                        'products_type' => 1,
+                        'orders_type' => 0
+                    ]
+                ],
+                [
+                    [
+                        'id' => 100,
+                        'customer_email' => 'test@example.com',
+                        'created_at' => '2013-04-04 03:34:48',
+                        'ordered_items' => [
+                            ['custom_product_type' => 'КБТ']
+                        ]
+                    ]
+                ],
+                [9 => [100]]
+            ],
+            'one user two matched orders' => [
+                [
+                    [
+                        'queue_id' => 2,
+                        'user_id' => 8,
+                        'products_type' => 1,
+                        'orders_type' => 0
+                    ]
+                ],
+                [
+                    [
+                        'id' => 100,
+                        'customer_email' => 'test@example.com',
+                        'created_at' => '2013-04-04 03:34:48',
+                        'ordered_items' => [
+                            ['custom_product_type' => 'КБТ']
+                        ]
+                    ],
+                    [
+                        'id' => 200,
+                        'customer_email' => 'test2@example.com',
+                        'created_at' => '2013-04-04 03:34:48',
+                        'ordered_items' => [
+                            ['custom_product_type' => 'КБТ'],
+                            ['custom_product_type' => 'МБТ']
+                        ]
+                    ]
+                ],
+                [8 => [100, 200]]
+            ],
+            'one user one not matched order' => [
+                [
+                    [
+                        'queue_id' => 3,
+                        'user_id' => 10,
+                        'products_type' => 2,
+                        'orders_type' => 0
+                    ]
+                ],
+                [
+                    [
+                        'id' => 100,
+                        'customer_email' => 'test@example.com',
+                        'created_at' => '2013-04-04 03:34:48',
+                        'ordered_items' => [
+                            ['custom_product_type' => 'КБТ']
+                        ]
+                    ]
+                ],
+                []
+            ],
+        ];
+    }
 
+    /**
+     * @param $itemsQueue
+     * @return TSG_CallCenter_Model_Adapter_Queue_Collection
+     * @throws Exception
+     */
+    private function getCollectionQueueData($itemsQueue): TSG_CallCenter_Model_Adapter_Queue_Collection
+    {
         $collection = $this->modelQueue;
-        $collection->addItem($item);
+
+        foreach ($itemsQueue as $itemQueue) {
+            $item = new Varien_Object();
+            $item->setQueueId($itemQueue['queue_id']);
+            $item->setUserId($itemQueue['user_id']);
+            $item->setProductsType($itemQueue['products_type']);
+            $item->setOrdersType($itemQueue['orders_type']);
+            $collection->addItem($item);
+        }
+
         return $collection;
     }
 
-    private function getCollectionOrderData(): TSG_CallCenter_Model_Adapter_Order_Collection
+    /**
+     * @param $itemsOrder
+     * @return TSG_CallCenter_Model_Adapter_Order_Collection
+     * @throws Exception
+     */
+    private function getCollectionOrderData($itemsOrder): TSG_CallCenter_Model_Adapter_Order_Collection
     {
         $collection = $this->modelOrder;
 
-        $item1 = new Varien_Object();
-        $item1->setId(100);
-        $item1->setCustomerEmail('test@example.com');
-        $item1->setCreatedAt('2013-04-04 03:34:48');
+        foreach ($itemsOrder as $itemOrder) {
+            $item = new Varien_Object();
+            $item->setId($itemOrder['id']);
+            $item->setCustomerEmail($itemOrder['customer_email']);
+            $item->setCreatedAt($itemOrder['created_at']);
 
-        $orderItems1 = [];
-        $resultOrderItem = new Varien_Object();
-        $resultOrderItem->setCustomProductType('КБТ');
-        $orderItems1[] = $resultOrderItem;
-
-        $item1->setOrderedItems($orderItems1);
-
-        $collection->addItem($item1);
-
-        $item2 = new Varien_Object();
-        $item2->setId(200);
-        $item2->setCustomerEmail('test2@example.com');
-        $item2->setCreatedAt('2013-04-04 03:34:48');
-
-        $orderItems2 = [];
-        $resultOrderItem = new Varien_Object();
-        $resultOrderItem->setCustomProductType('КБТ');
-        $orderItems2[] = $resultOrderItem;
-        $resultOrderItem = new Varien_Object();
-        $resultOrderItem->setCustomProductType('МБТ');
-        $orderItems2[] = $resultOrderItem;
-
-        $item2->setOrderedItems($orderItems2);
-
-        $collection->addItem($item2);
+            $orderItems = [];
+            foreach ($itemOrder['ordered_items'] as $orderedItem) {
+                $orderItem = new Varien_Object();
+                $orderItem->setCustomProductType($orderedItem['custom_product_type']);
+                $orderItems[] = $orderItem;
+                $item->setOrderedItems($orderItems);
+            }
+            $collection->addItem($item);
+        }
 
         return $collection;
-    }
-
-    private function getResultQueueData()
-    {
-        return array(
-            9 => array(100, 200)
-        );
     }
 }
