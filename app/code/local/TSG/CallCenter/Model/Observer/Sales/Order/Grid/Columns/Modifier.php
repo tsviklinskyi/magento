@@ -34,18 +34,16 @@ class TSG_CallCenter_Model_Observer_Sales_Order_Grid_Columns_Modifier
     /**
      * Add user role filter to collection
      *
-     * @param $collection
-     * @return $this
+     * @param Mage_Sales_Model_Resource_Order_Grid_Collection $collection
      */
-    private function _filterCollectionByRole(Mage_Sales_Model_Resource_Order_Grid_Collection $collection)
+    private function _filterCollectionByRole(Mage_Sales_Model_Resource_Order_Grid_Collection $collection): void
     {
         /* @var TSG_CallCenter_Model_Queue $callcenterQueue */
         $callcenterQueue = Mage::getModel('callcenter/queue');
-        if ($callcenterQueue->isAllowedByRole()) {
+        if ($callcenterQueue->isAllowedByRole(1)) {
             $collection->addAttributeToFilter('initiator_id', Mage::getSingleton('admin/session')->getUser()->getUserId());
         }elseif ($callcenterQueue->isAllowedByRole(2)) {
             $collection->addAttributeToFilter('initiator_id', array('notnull' => true));
         }
-        return $this;
     }
 }

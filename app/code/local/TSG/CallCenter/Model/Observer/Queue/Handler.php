@@ -146,7 +146,7 @@ class TSG_CallCenter_Model_Observer_Queue_Handler
                 $orderIsMatchByTimeRange = $this->checkOrderIsMatchByTimeRange($order->getCreatedAt(), 8, 20);
                 break;
             default:
-                $orderIsMatchByTimeRange = false;
+                $orderIsMatchByTimeRange = true;
                 break;
         }
         if ($orderIsMatchByTimeRange === false) {

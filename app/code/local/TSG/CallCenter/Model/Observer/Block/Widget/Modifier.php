@@ -16,7 +16,7 @@ class TSG_CallCenter_Model_Observer_Block_Widget_Modifier
             case 'adminhtml/sales_order':
                 /* @var TSG_CallCenter_Model_Queue $callcenterQueue */
                 $callcenterQueue = Mage::getModel('callcenter/queue');
-                if ($callcenterQueue->isAllowedByRole() && $callcenterQueue->getCountOrdersByUser() === 0) {
+                if ($callcenterQueue->isAllowedByRole(1) && $callcenterQueue->getCountOrdersByUser() === 0) {
                     if ($callcenterQueue->getCountByUser()) {
                         $data = array(
                             'label'     => 'Waiting order',

@@ -1,18 +1,18 @@
 <?php
 class TSG_CallCenter_Model_Queue extends Mage_Core_Model_Abstract
 {
-    protected $_allowedRoleNames = array(
+    private const ALLOWED_ROLE_NAMES = array(
         1 => array('CallCenterSpecialist'),
         2 => array('CallCenterCoordinator')
     );
 
-    protected $_orderTypes = array(
+    private const ORDER_TYPES = array(
         '1' => 'Ночные - (с 20.00 до 08.00)',
         '2' => 'Дневные - (с 08.00 до 20.00)',
         '0' => 'Не указан'
     );
 
-    protected $_productTypes = array(
+    private const PRODUCT_TYPES = array(
         '1' => 'КБТ',
         '2' => 'МБТ',
         '3' => 'Гаджеты',
@@ -29,7 +29,7 @@ class TSG_CallCenter_Model_Queue extends Mage_Core_Model_Abstract
      */
     public function getAllowedRoleNames()
     {
-        return $this->_allowedRoleNames;
+        return self::ALLOWED_ROLE_NAMES;
     }
 
     /**
@@ -37,7 +37,7 @@ class TSG_CallCenter_Model_Queue extends Mage_Core_Model_Abstract
      */
     public function getProductTypes()
     {
-        return $this->_productTypes;
+        return self::PRODUCT_TYPES;
     }
 
     /**
@@ -45,7 +45,7 @@ class TSG_CallCenter_Model_Queue extends Mage_Core_Model_Abstract
      */
     public function getOrderTypes()
     {
-        return $this->_orderTypes;
+        return self::ORDER_TYPES;
     }
 
     /**
@@ -54,10 +54,10 @@ class TSG_CallCenter_Model_Queue extends Mage_Core_Model_Abstract
      * @param int $roleType
      * @return bool
      */
-    public function isAllowedByRole(int $roleType = 1): bool
+    public function isAllowedByRole(int $roleType): bool
     {
         $allowed = false;
-        if (in_array(Mage::getSingleton('admin/session')->getUser()->getRole()->getRoleName(), $this->_allowedRoleNames[$roleType])) {
+        if (in_array(Mage::getSingleton('admin/session')->getUser()->getRole()->getRoleName(), self::ALLOWED_ROLE_NAMES[$roleType])) {
             $allowed = true;
         }
         return $allowed;
@@ -92,12 +92,11 @@ class TSG_CallCenter_Model_Queue extends Mage_Core_Model_Abstract
      *
      * @param $initiatorId
      * @param $orderIds
-     * @return $this
      */
-    public function saveInitiatorToOrders(int $initiatorId, array $orderIds)
+    public function saveInitiatorToOrders(int $initiatorId, array $orderIds): void
     {
         if (empty($orderIds)) {
-            return $this;
+            return;
         }
         /* @var Mage_Sales_Model_Order $modelOrder */
         $modelOrder = Mage::getModel('sales/order');
@@ -106,6 +105,5 @@ class TSG_CallCenter_Model_Queue extends Mage_Core_Model_Abstract
         foreach ($ordersCollection as $order) {
             $order->setInitiatorId($initiatorId)->save();
         }
-        return $this;
     }
 }
