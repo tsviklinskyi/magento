@@ -519,11 +519,10 @@ class TSG_Callcenter_Test_Model_Observer_Queue_HandlerTest extends PHPUnit_Frame
      * @param string $sortKey
      * @return array
      */
-    private function getSortedArray(array $items, string $sortKey = 'created_at')
+    private function getSortedArray(array $items, string $sortKey = 'created_at'): array
     {
         $sortBy = array();
-        foreach ($items as $key => $row)
-        {
+        foreach ($items as $key => $row) {
             $sortBy[$key] = $row[$sortKey];
         }
         array_multisort($sortBy, SORT_ASC, $items);

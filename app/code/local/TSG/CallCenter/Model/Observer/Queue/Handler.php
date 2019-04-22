@@ -2,11 +2,6 @@
 class TSG_CallCenter_Model_Observer_Queue_Handler
 {
     /**
-     * @var array $queueData
-     */
-    private $queueData = [];
-
-    /**
      * Distribution queue of waiting users, save relations users with orders and clear queue
      */
     public function queueDistribution()
@@ -48,32 +43,37 @@ class TSG_CallCenter_Model_Observer_Queue_Handler
      */
     public function generateDataByQueue(TSG_CallCenter_Model_Adapter_Queue_Collection $collectionQueue, TSG_CallCenter_Model_Adapter_Order_Collection $ordersCollection): array
     {
-        $this->queueData = [];
-        $allMatchedOrderIds = [];
+        $userMatchedIds = [];
+
+        foreach ($ordersCollection as $order) {
+            $customKey = $this->generateCustomKey($order);
+            $order->setCustomKey($customKey);
+        }
+
         foreach ($collectionQueue as $itemQueue) {
-            $userMatchedIds = [];
-            $userMatchedEmails = [];
-            foreach ($ordersCollection as $order) {
-                $orderMatch = $this->isOrderMatch($order, $itemQueue);
-                if ($orderMatch && !in_array($order->getId(), $allMatchedOrderIds)) { // if order is match and not distributed yet
-                    $userMatchedIds[] = $order->getId();
-                    $allMatchedOrderIds[] = $order->getId();
-                    if (!in_array($order->getCustomerEmail(), $userMatchedEmails)) {
-                        $userMatchedEmails[] = $order->getCustomerEmail();
+            $userCustomKey = "product_type_{$itemQueue->getProductsType()}_order_type_{$itemQueue->getOrdersType()}";
+            if ($itemQueue->getOrdersType() === TSG_CallCenter_Model_Queue::ORDERS_TYPE_NOT_SPECIFIED) {
+                $userCustomKey = "product_type_{$itemQueue->getProductsType()}_order_type_";
+                $matched = $ordersCollection->getItemByColumnValueLike('custom_key', $userCustomKey);
+            }else{
+                $matched = $ordersCollection->getItemByColumnValue('custom_key', $userCustomKey);
+            }
+
+            if ($matched !== null) {
+                $userMatchedIds[$itemQueue->getUserId()] = [$matched->getId()];
+
+                $ordersCollection->removeItemByKey($matched->getId());
+
+                $matchedByEmail = $ordersCollection->getItemsByColumnValue('customer_email', $matched->getCustomerEmail());
+                if (!empty($matchedByEmail)) {
+                    foreach ($matchedByEmail as $item) {
+                        $userMatchedIds[$itemQueue->getUserId()][] = $item->getId();
+                        $ordersCollection->removeItemByKey($item->getId());
                     }
-                    break;
                 }
             }
-            $matchedOrderIdsByEmails = $this->checkByEmails($itemQueue, $ordersCollection, $userMatchedEmails);
-            if (!empty($matchedOrderIdsByEmails)) {
-                $userMatchedIds = array_unique(array_merge($userMatchedIds, $matchedOrderIdsByEmails));
-                $userMatchedIds = array_values($userMatchedIds);
-            }
-            if (!empty($userMatchedIds)) {
-                $this->queueData[$itemQueue->getUserId()] = $userMatchedIds;
-            }
         }
-        return $this->queueData;
+        return $userMatchedIds;
     }
 
     /**
@@ -114,70 +114,42 @@ class TSG_CallCenter_Model_Observer_Queue_Handler
     }
 
     /**
-     * Check another orders by founded emails
-     *
-     * @param Varien_Object $itemQueue
-     * @param TSG_CallCenter_Model_Adapter_Order_Collection $ordersCollection
-     * @param array $matchedEmails
-     * @return array
-     */
-    private function checkByEmails(Varien_Object $itemQueue, TSG_CallCenter_Model_Adapter_Order_Collection $ordersCollection, array $matchedEmails): array
-    {
-        $matchedOrderIds = [];
-        if (empty($matchedEmails)) {
-            return $matchedOrderIds;
-        }
-        foreach ($ordersCollection as $order) {
-            if (!in_array($order->getCustomerEmail(), $matchedEmails)) {
-                continue;
-            }
-            $orderMatch = $this->isOrderMatch($order, $itemQueue);
-            if ($orderMatch) {
-                $matchedOrderIds[] = $order->getId();
-            }
-        }
-        return $matchedOrderIds;
-    }
-
-    /**
-     * Check order is match by user criteria
+     * Generating custom key of order
      *
      * @param Varien_Object $order
-     * @param Varien_Object $itemQueue
-     * @return bool
+     * @return string
      */
-    private function isOrderMatch(Varien_Object $order, Varien_Object $itemQueue): bool
+    private function generateCustomKey(Varien_Object $order)
     {
-        $orderMatch = false;
-        switch ($itemQueue->getOrdersType()){
-            case 1:
-                $orderIsMatchByTimeRange = $this->checkOrderIsMatchByTimeRange($order->getCreatedAt(), 20, 8);
-                break;
-            case 2:
-                $orderIsMatchByTimeRange = $this->checkOrderIsMatchByTimeRange($order->getCreatedAt(), 8, 20);
-                break;
-            default:
-                $orderIsMatchByTimeRange = true;
-                break;
+        /* @var TSG_CallCenter_Model_Queue $callcenterQueue */
+        $callcenterQueue = Mage::getModel('callcenter/queue');
+
+        $orderType = 0;
+        if ($this->checkOrderIsMatchByTimeRange($order->getCreatedAt(), 20, 8)) {
+            $orderType = 1;
+        }elseif($this->checkOrderIsMatchByTimeRange($order->getCreatedAt(), 8, 20)) {
+            $orderType = 2;
         }
-        if ($orderIsMatchByTimeRange === false) {
-            return false;
-        }
-        $productsCriteria = $this->generateProductsCriteria($itemQueue->getProductsType());
+
+        $typeCounts = [];
         foreach ($order->getOrderedItems() as $orderItem) {
-            if (true === $productsCriteria[$orderItem->getCustomProductType()] && count($productsCriteria) === 1) {
-                $orderMatch = true;
-                break;
-            }else{
-                if (false === $productsCriteria[$orderItem->getCustomProductType()]) {
-                    continue; // if find one 'false' go to check next order item
-                }
-                if (true === $productsCriteria[$orderItem->getCustomProductType()] || !$orderItem->getCustomProductType()) {
-                    $orderMatch = true;
-                }
+            if (!isset($typeCounts[$orderItem->getCustomProductType()])) {
+                $typeCounts[$orderItem->getCustomProductType()] = 0;
             }
+            $typeCounts[$orderItem->getCustomProductType()]++;
         }
-        return $orderMatch;
+
+        if ($typeCounts[$callcenterQueue->getProductTypes()[TSG_CallCenter_Model_Queue::PRODUCTS_TYPE_LARGE_DEVICES]] > 0) {
+            $productType = '1';
+        }elseif ($typeCounts[$callcenterQueue->getProductTypes()[TSG_CallCenter_Model_Queue::PRODUCTS_TYPE_SMALL_DEVICES]] > 0) {
+            $productType = '2';
+        }elseif ($typeCounts[$callcenterQueue->getProductTypes()[TSG_CallCenter_Model_Queue::PRODUCTS_TYPE_GADGETS]] > 0) {
+            $productType = '3';
+        }else {
+            $productType = '0';
+        }
+
+        return "product_type_{$productType}_order_type_{$orderType}";
     }
 
     /**
@@ -209,50 +181,5 @@ class TSG_CallCenter_Model_Observer_Queue_Handler
             }
         }
         return false;
-    }
-
-    /**
-     * Generate criteria for collection by products
-     *
-     * @param $productsType
-     * @return array
-     */
-    private function generateProductsCriteria(string $productsType): array
-    {
-        $criteria = [];
-        /* @var TSG_CallCenter_Model_Queue $callcenterQueue */
-        $callcenterQueue = Mage::getModel('callcenter/queue');
-        switch ($productsType){
-            case '1':
-                $criteria = array(
-                    $callcenterQueue->getProductTypes()['1'] => true
-                );
-                break;
-            case '2':
-                $criteria = array(
-                    $callcenterQueue->getProductTypes()['1'] => false,
-                    $callcenterQueue->getProductTypes()['2'] => true
-                );
-                break;
-            case '3':
-                $criteria = array(
-                    $callcenterQueue->getProductTypes()['1'] => false,
-                    $callcenterQueue->getProductTypes()['2'] => false,
-                    $callcenterQueue->getProductTypes()['3'] => true
-                );
-                break;
-            case '0':
-                $criteria = array(
-                    $callcenterQueue->getProductTypes()['1'] => false,
-                    $callcenterQueue->getProductTypes()['2'] => false,
-                    $callcenterQueue->getProductTypes()['3'] => false,
-                    $callcenterQueue->getProductTypes()['0'] => true
-                );
-                break;
-            default:
-                // do nothing
-                break;
-        }
-        return $criteria;
     }
 }

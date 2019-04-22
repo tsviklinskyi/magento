@@ -2,7 +2,7 @@
 <config>
     <modules>
         <TSG_CallCenter>
-            <version>0.0.7</version>
+            <version>0.0.8</version>
         </TSG_CallCenter>
     </modules>
     <global>
@@ -50,7 +50,24 @@
                     </save_primary_initiator>
                 </observers>
             </sales_order_save_before>
+            <sales_quote_item_set_product>
+                <observers>
+                    <set_custom_product_type>
+                        <class>TSG_CallCenter_Model_Observer_Sales_Quote_Item</class>
+                        <method>setCustomProductType</method>
+                    </set_custom_product_type>
+                </observers>
+            </sales_quote_item_set_product>
         </events>
+        <sales>
+            <quote>
+                <item>
+                    <product_attributes>
+                        <custom_product_type/>
+                    </product_attributes>
+                </item>
+            </quote>
+        </sales>
     </global>
     <admin>
         <routers>

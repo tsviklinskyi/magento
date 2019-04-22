@@ -16,8 +16,8 @@ class TSG_CallCenter_Model_Observer_Block_Widget_Modifier
             case 'adminhtml/sales_order':
                 /* @var TSG_CallCenter_Model_Queue $callcenterQueue */
                 $callcenterQueue = Mage::getModel('callcenter/queue');
-                if (Mage::getSingleton('admin/session')->isAllowed('sales/callcenter/actions/add_to_queue') && empty($callcenterQueue->getCountOrdersByUser())) {
-                    if ($callcenterQueue->getCountByUser()) {
+                if (Mage::getSingleton('admin/session')->isAllowed('sales/callcenter/actions/add_to_queue') && empty($callcenterQueue->userHaveOrders())) {
+                    if ($callcenterQueue->isUserInQueue()) {
                         $data = array(
                             'label'     => 'Waiting order',
                             'class'     => 'disabled reload-page-5',

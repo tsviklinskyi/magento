@@ -14,6 +14,18 @@ class TSG_CallCenter_Model_Adapter_Order_Collection extends Varien_Data_Collecti
         $this->_items = $items;
     }
 
+    public function getItemByColumnValueLike($column, $value)
+    {
+        $this->load();
+
+        foreach ($this as $item) {
+            if (strpos($item->getData($column), $value) !== false) {
+                return $item;
+            }
+        }
+        return null;
+    }
+
     /**
      * Adapt order
      *
@@ -31,9 +43,9 @@ class TSG_CallCenter_Model_Adapter_Order_Collection extends Varien_Data_Collecti
         $orderItems = [];
         foreach ($order->getAllItems() as $orderItem) {
             $resultOrderItem = new Varien_Object();
-            $customProductType = Mage::getModel('catalog/product')->load($orderItem->getProductId())->getAttributeText('custom_product_type');
+            //$customProductType = Mage::getModel('catalog/product')->load($orderItem->getProductId())->getAttributeText('custom_product_type');
             //$customProductType = Mage::getResourceModel('catalog/product')->getAttributeRawValue($orderItem->getProductId(), 'custom_product_type', $order->getStoreId());
-            $resultOrderItem->setCustomProductType($customProductType);
+            $resultOrderItem->setCustomProductType($orderItem->getCustomProductType());
             $orderItems[] = $resultOrderItem;
         }
         $result->setOrderedItems($orderItems);

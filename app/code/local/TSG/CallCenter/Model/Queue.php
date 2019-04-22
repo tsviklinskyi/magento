@@ -45,39 +45,41 @@ class TSG_CallCenter_Model_Queue extends Mage_Core_Model_Abstract
     }
 
     /**
-     * Get count rows in queue by current user
+     * Check is user in queue
      *
-     * @param int $limit
-     * @return array
+     * @return bool
      */
-    public function getCountByUser(int $limit = null): array
+    public function isUserInQueue(): bool
     {
-        if ($limit === null) {
-            $limit = 10;
-        }
+        $result = false;
+        $limit = 1;
         /* @var Mage_Admin_Model_User $adminUser */
         $adminUser = Mage::getSingleton('admin/session')->getUser();
         $collection = $this->getCollection()
             ->addFieldToFilter('user_id', $adminUser->getId());
-        return $collection->getAllIds($limit);
+        if (count($collection->getAllIds($limit)) > 0) {
+            $result = true;
+        }
+        return $result;
     }
 
     /**
-     * Get count orders in database by current user filtered by order statuses
+     * Check count orders in database by current user filtered by order statuses
      *
-     * @param int $limit
-     * @return array
+     * @return bool
      */
-    public function getCountOrdersByUser(int $limit = null): array
+    public function userHaveOrders(): bool
     {
+        $result = false;
         $statuses = array('pending');
-        if ($limit === null) {
-            $limit = 10;
-        }
+        $limit = 1;
         $orders = Mage::getModel('sales/order')->getCollection()
             ->addFieldToFilter('status', array('in' => $statuses))
             ->addFieldToFilter('initiator_id', Mage::getSingleton('admin/session')->getUser()->getId());
-        return $orders->getAllIds($limit);
+        if (count($orders->getAllIds($limit)) > 0) {
+            $result = true;
+        }
+        return $result;
     }
 
     /**
