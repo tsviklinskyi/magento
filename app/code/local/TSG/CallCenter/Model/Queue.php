@@ -5,8 +5,8 @@ class TSG_CallCenter_Model_Queue extends Mage_Core_Model_Abstract
     private const COORDINATOR_ROLES_KEY = 2;
 
     private const ALLOWED_ROLE_NAMES = array(
-        1 => array('CallCenterSpecialist'),
-        2 => array('CallCenterCoordinator')
+        self::SPECIALIST_ROLES_KEY => array('CallCenterSpecialist'),
+        self::COORDINATOR_ROLES_KEY => array('CallCenterCoordinator')
     );
 
     private const ORDER_TYPES = array(
@@ -75,8 +75,10 @@ class TSG_CallCenter_Model_Queue extends Mage_Core_Model_Abstract
      */
     public function isAllowedByRole(int $roleType): bool
     {
-        $allowed = true;
-        if (in_array(Mage::getSingleton('admin/session')->getUser()->getRole()->getRoleName(), self::ALLOWED_ROLE_NAMES[$roleType])) {
+        $allowed = false;
+        /* @var Mage_Admin_Model_User $adminUser */
+        $adminUser = Mage::getSingleton('admin/session')->getUser();
+        if (in_array($adminUser->getRole()->getRoleName(), self::ALLOWED_ROLE_NAMES[$roleType])) {
             $allowed = true;
         }
         return $allowed;
