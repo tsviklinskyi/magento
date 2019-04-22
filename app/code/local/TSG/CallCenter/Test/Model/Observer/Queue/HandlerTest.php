@@ -130,6 +130,327 @@ class TSG_Callcenter_Test_Model_Observer_Queue_HandlerTest extends PHPUnit_Frame
                 ],
                 []
             ],
+            'two user two matched orders' => [
+                [
+                    [
+                        'queue_id' => 1,
+                        'user_id' => 8,
+                        'products_type' => 1,
+                        'orders_type' => 2
+                    ],
+                    [
+                        'queue_id' => 2,
+                        'user_id' => 9,
+                        'products_type' => 1,
+                        'orders_type' => 1
+                    ]
+                ],
+                [
+                    [
+                        'id' => 100,
+                        'customer_email' => 'test@example.com',
+                        'created_at' => '2013-04-04 10:34:48',
+                        'ordered_items' => [
+                            ['custom_product_type' => 'КБТ']
+                        ]
+                    ],
+                    [
+                        'id' => 200,
+                        'customer_email' => 'test2@example.com',
+                        'created_at' => '2013-04-04 03:34:48',
+                        'ordered_items' => [
+                            ['custom_product_type' => 'КБТ'],
+                            ['custom_product_type' => 'МБТ']
+                        ]
+                    ]
+                ],
+                [9 => [200], 8 => [100]]
+            ],
+            'two user one matched order' => [
+                [
+                    [
+                        'queue_id' => 1,
+                        'user_id' => 8,
+                        'products_type' => 3,
+                        'orders_type' => 2
+                    ],
+                    [
+                        'queue_id' => 2,
+                        'user_id' => 9,
+                        'products_type' => 1,
+                        'orders_type' => 1
+                    ]
+                ],
+                [
+                    [
+                        'id' => 100,
+                        'customer_email' => 'test@example.com',
+                        'created_at' => '2013-04-04 10:34:48',
+                        'ordered_items' => [
+                            ['custom_product_type' => 'КБТ']
+                        ]
+                    ],
+                    [
+                        'id' => 200,
+                        'customer_email' => 'test2@example.com',
+                        'created_at' => '2013-04-04 03:34:48',
+                        'ordered_items' => [
+                            ['custom_product_type' => 'КБТ'],
+                            ['custom_product_type' => 'МБТ']
+                        ]
+                    ]
+                ],
+                [9 => [200]]
+            ],
+            'two user three matched orders' => [
+                [
+                    [
+                        'queue_id' => 1,
+                        'user_id' => 8,
+                        'products_type' => 0,
+                        'orders_type' => 1
+                    ],
+                    [
+                        'queue_id' => 2,
+                        'user_id' => 9,
+                        'products_type' => 1,
+                        'orders_type' => 2
+                    ]
+                ],
+                [
+                    [
+                        'id' => 100,
+                        'customer_email' => 'test@example.com',
+                        'created_at' => '2013-04-04 10:34:48',
+                        'ordered_items' => [
+                            ['custom_product_type' => 'КБТ']
+                        ]
+                    ],
+                    [
+                        'id' => 200,
+                        'customer_email' => 'test2@example.com',
+                        'created_at' => '2013-04-04 03:34:48',
+                        'ordered_items' => [
+                            ['custom_product_type' => ''],
+                            ['custom_product_type' => '']
+                        ]
+                    ],
+                    [
+                        'id' => 300,
+                        'customer_email' => 'test3@example.com',
+                        'created_at' => '2013-04-04 12:34:48',
+                        'ordered_items' => [
+                            ['custom_product_type' => 'КБТ'],
+                            ['custom_product_type' => 'МБТ']
+                        ]
+                    ]
+                ],
+                [8 => [200], 9 => [100, 300]]
+            ],
+            'two user two matched orders and one not matched' => [
+                [
+                    [
+                        'queue_id' => 1,
+                        'user_id' => 8,
+                        'products_type' => 0,
+                        'orders_type' => 1
+                    ],
+                    [
+                        'queue_id' => 2,
+                        'user_id' => 9,
+                        'products_type' => 1,
+                        'orders_type' => 2
+                    ]
+                ],
+                [
+                    [
+                        'id' => 100,
+                        'customer_email' => 'test@example.com',
+                        'created_at' => '2013-04-04 10:34:48',
+                        'ordered_items' => [
+                            ['custom_product_type' => 'МБТ']
+                        ]
+                    ],
+                    [
+                        'id' => 200,
+                        'customer_email' => 'test2@example.com',
+                        'created_at' => '2013-04-04 03:34:48',
+                        'ordered_items' => [
+                            ['custom_product_type' => ''],
+                            ['custom_product_type' => '']
+                        ]
+                    ],
+                    [
+                        'id' => 300,
+                        'customer_email' => 'test3@example.com',
+                        'created_at' => '2013-04-04 12:34:48',
+                        'ordered_items' => [
+                            ['custom_product_type' => 'КБТ'],
+                            ['custom_product_type' => 'МБТ']
+                        ]
+                    ]
+                ],
+                [8 => [200], 9 => [300]]
+            ],
+            'two user two matched orders and two not matched' => [
+                [
+                    [
+                        'queue_id' => 1,
+                        'user_id' => 8,
+                        'products_type' => 0,
+                        'orders_type' => 1
+                    ],
+                    [
+                        'queue_id' => 2,
+                        'user_id' => 9,
+                        'products_type' => 1,
+                        'orders_type' => 2
+                    ]
+                ],
+                [
+                    [
+                        'id' => 100,
+                        'customer_email' => 'test@example.com',
+                        'created_at' => '2013-04-04 10:34:48',
+                        'ordered_items' => [
+                            ['custom_product_type' => 'МБТ']
+                        ]
+                    ],
+                    [
+                        'id' => 200,
+                        'customer_email' => 'test2@example.com',
+                        'created_at' => '2013-04-04 03:34:48',
+                        'ordered_items' => [
+                            ['custom_product_type' => ''],
+                            ['custom_product_type' => '']
+                        ]
+                    ],
+                    [
+                        'id' => 300,
+                        'customer_email' => 'test3@example.com',
+                        'created_at' => '2013-04-04 12:34:48',
+                        'ordered_items' => [
+                            ['custom_product_type' => 'КБТ'],
+                            ['custom_product_type' => 'МБТ']
+                        ]
+                    ],
+                    [
+                        'id' => 400,
+                        'customer_email' => 'test@example.com',
+                        'created_at' => '2013-04-04 14:34:48',
+                        'ordered_items' => [
+                            ['custom_product_type' => 'МБТ']
+                        ]
+                    ],
+                ],
+                [8 => [200], 9 => [300]]
+            ],
+            'two user four matched orders' => [
+                [
+                    [
+                        'queue_id' => 1,
+                        'user_id' => 8,
+                        'products_type' => 0,
+                        'orders_type' => 1
+                    ],
+                    [
+                        'queue_id' => 2,
+                        'user_id' => 9,
+                        'products_type' => 1,
+                        'orders_type' => 2
+                    ]
+                ],
+                [
+                    [
+                        'id' => 100,
+                        'customer_email' => 'test@example.com',
+                        'created_at' => '2013-04-04 10:34:48',
+                        'ordered_items' => [
+                            ['custom_product_type' => 'КБТ']
+                        ]
+                    ],
+                    [
+                        'id' => 200,
+                        'customer_email' => 'test2@example.com',
+                        'created_at' => '2013-04-04 03:34:48',
+                        'ordered_items' => [
+                            ['custom_product_type' => ''],
+                            ['custom_product_type' => '']
+                        ]
+                    ],
+                    [
+                        'id' => 300,
+                        'customer_email' => 'test3@example.com',
+                        'created_at' => '2013-04-04 12:34:48',
+                        'ordered_items' => [
+                            ['custom_product_type' => 'КБТ'],
+                            ['custom_product_type' => 'МБТ']
+                        ]
+                    ],
+                    [
+                        'id' => 400,
+                        'customer_email' => 'test@example.com',
+                        'created_at' => '2013-04-04 06:34:48',
+                        'ordered_items' => [
+                            ['custom_product_type' => '']
+                        ]
+                    ],
+                ],
+                [8 => [200, 400], 9 => [100, 300]]
+            ],
+            'two user three matched orders and one not matched' => [
+                [
+                    [
+                        'queue_id' => 1,
+                        'user_id' => 8,
+                        'products_type' => 0,
+                        'orders_type' => 1
+                    ],
+                    [
+                        'queue_id' => 2,
+                        'user_id' => 9,
+                        'products_type' => 3,
+                        'orders_type' => 2
+                    ]
+                ],
+                [
+                    [
+                        'id' => 100,
+                        'customer_email' => 'test@example.com',
+                        'created_at' => '2013-04-04 10:34:48',
+                        'ordered_items' => [
+                            ['custom_product_type' => 'МБТ']
+                        ]
+                    ],
+                    [
+                        'id' => 200,
+                        'customer_email' => 'test2@example.com',
+                        'created_at' => '2013-04-04 03:34:48',
+                        'ordered_items' => [
+                            ['custom_product_type' => ''],
+                            ['custom_product_type' => '']
+                        ]
+                    ],
+                    [
+                        'id' => 300,
+                        'customer_email' => 'test3@example.com',
+                        'created_at' => '2013-04-04 12:34:48',
+                        'ordered_items' => [
+                            ['custom_product_type' => 'Гаджеты'],
+                            ['custom_product_type' => '']
+                        ]
+                    ],
+                    [
+                        'id' => 400,
+                        'customer_email' => 'test@example.com',
+                        'created_at' => '2013-04-04 14:34:48',
+                        'ordered_items' => [
+                            ['custom_product_type' => 'Гаджеты']
+                        ]
+                    ],
+                ],
+                [8 => [200], 9 => [300, 400]]
+            ],
         ];
     }
 

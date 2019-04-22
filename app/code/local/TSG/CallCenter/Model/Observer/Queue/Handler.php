@@ -167,9 +167,9 @@ class TSG_CallCenter_Model_Observer_Queue_Handler
                 break;
             }else{
                 if (false === $productsCriteria[$orderItem->getCustomProductType()]) {
-                    continue; // if find one 'false' go to check next order
+                    continue; // if find one 'false' go to check next order item
                 }
-                if (true === $productsCriteria[$orderItem->getCustomProductType()]) {
+                if (true === $productsCriteria[$orderItem->getCustomProductType()] || !$orderItem->getCustomProductType()) {
                     $orderMatch = true;
                 }
             }
