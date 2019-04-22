@@ -38,12 +38,10 @@ class TSG_CallCenter_Model_Observer_Sales_Order_Grid_Columns_Modifier
      */
     private function _filterCollectionByRole(Mage_Sales_Model_Resource_Order_Grid_Collection $collection): void
     {
-        /* @var TSG_CallCenter_Model_Queue $callcenterQueue */
-        $callcenterQueue = Mage::getModel('callcenter/queue');
-        if ($callcenterQueue->isAllowedByRole($callcenterQueue->getSpecialistRolesKey())) {
+        if (Mage::getSingleton('admin/session')->isAllowed('sales/order/actions/view_orders_with_me_initiator')) {
             $collection->addAttributeToFilter('initiator_id', Mage::getSingleton('admin/session')->getUser()->getUserId());
-        }elseif ($callcenterQueue->isAllowedByRole($callcenterQueue->getCoordinatorRolesKey())) {
-            $collection->addAttributeToFilter('initiator_id', array('notnull' => true));
+        }elseif (Mage::getSingleton('admin/session')->isAllowed('sales/order/actions/view_orders_with_not_empty_initiator')) {
+            //$collection->addAttributeToFilter('initiator_id', array('notnull' => true));
         }
     }
 }

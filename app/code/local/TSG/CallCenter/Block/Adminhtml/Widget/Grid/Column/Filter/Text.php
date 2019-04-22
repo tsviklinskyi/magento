@@ -8,7 +8,7 @@ class TSG_CallCenter_Block_Adminhtml_Widget_Grid_Column_Filter_Text extends Mage
     {
         /* @var TSG_CallCenter_Model_Queue $callcenterQueue */
         $callcenterQueue = Mage::getModel('callcenter/queue');
-        if ($this->getColumn()->getIndex() === 'customer_email' && $callcenterQueue->isAllowedByRole($callcenterQueue->getSpecialistRolesKey())) {
+        if ($this->getColumn()->getIndex() === 'customer_email' && Mage::getSingleton('admin/session')->isAllowed('sales/order/actions/view_orders_with_me_initiator')) {
             return array('eq' => $this->getValue());
         }else{
             return parent::getCondition();

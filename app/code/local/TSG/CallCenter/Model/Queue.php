@@ -10,14 +10,6 @@ class TSG_CallCenter_Model_Queue extends Mage_Core_Model_Abstract
     public const PRODUCTS_TYPE_GADGETS = '3';
     public const PRODUCTS_TYPE_NOT_SPECIFIED = '0';
 
-    private const SPECIALIST_ROLES_KEY = 1;
-    private const COORDINATOR_ROLES_KEY = 2;
-
-    private const ALLOWED_ROLE_NAMES = array(
-        self::SPECIALIST_ROLES_KEY => array('CallCenterSpecialist'),
-        self::COORDINATOR_ROLES_KEY => array('CallCenterCoordinator')
-    );
-
     private const ORDER_TYPES = array(
         self::ORDERS_TYPE_NIGHT => 'Ночные - (с 20.00 до 08.00)',
         self::ORDERS_TYPE_DAY => 'Дневные - (с 08.00 до 20.00)',
@@ -39,30 +31,6 @@ class TSG_CallCenter_Model_Queue extends Mage_Core_Model_Abstract
     /**
      * @return array
      */
-    public function getAllowedRoleNames()
-    {
-        return self::ALLOWED_ROLE_NAMES;
-    }
-
-    /**
-     * @return int
-     */
-    public function getSpecialistRolesKey()
-    {
-        return self::SPECIALIST_ROLES_KEY;
-    }
-
-    /**
-     * @return int
-     */
-    public function getCoordinatorRolesKey()
-    {
-        return self::COORDINATOR_ROLES_KEY;
-    }
-
-    /**
-     * @return array
-     */
     public function getProductTypes()
     {
         return self::PRODUCT_TYPES;
@@ -74,23 +42,6 @@ class TSG_CallCenter_Model_Queue extends Mage_Core_Model_Abstract
     public function getOrderTypes()
     {
         return self::ORDER_TYPES;
-    }
-
-    /**
-     * Check if user is in list of allowed roles
-     *
-     * @param int $roleType
-     * @return bool
-     */
-    public function isAllowedByRole(int $roleType): bool
-    {
-        $allowed = false;
-        /* @var Mage_Admin_Model_User $adminUser */
-        $adminUser = Mage::getSingleton('admin/session')->getUser();
-        if (in_array($adminUser->getRole()->getRoleName(), self::ALLOWED_ROLE_NAMES[$roleType])) {
-            $allowed = true;
-        }
-        return $allowed;
     }
 
     /**

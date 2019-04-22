@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<config>
+    <acl>
+        <resources>
+            <admin>
+                <children>
+                    <sales>
+                        <children>
+                            <order>
+                                <children>
+                                    <actions>
+                                        <children>
+                                            <view_orders_with_me_initiator translate="title">
+                                                <title>View orders with me initiator</title>
+                                                <sort_order>20</sort_order>
+                                            </view_orders_with_me_initiator>
+                                            <view_orders_with_not_empty_initiator translate="title">
+                                                <title>View orders with not empty initiator</title>
+                                                <sort_order>20</sort_order>
+                                            </view_orders_with_not_empty_initiator>
+                                        </children>
+                                    </actions>
+                                </children>
+                            </order>
+                            <callcenter translate="title">
+                                <title>Call Center</title>
+                                <children>
+                                    <actions>
+                                        <title>Actions</title>
+                                        <children>
+                                            <add_to_queue translate="title">
+                                                <title>Get order (add to queue)</title>
+                                                <sort_order>20</sort_order>
+                                            </add_to_queue>
+                                            <clear_initiator translate="title">
+                                                <title>Clear initiator</title>
+                                                <sort_order>20</sort_order>
+                                            </clear_initiator>
+                                        </children>
+                                    </actions>
+                                </children>
+                            </callcenter>
+                        </children>
+                    </sales>
+                </children>
+            </admin>
+        </resources>
+    </acl>
+</config>

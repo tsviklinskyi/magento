@@ -30,4 +30,9 @@ class TSG_CallCenter_Adminhtml_CallCenter_InitiatorController extends Mage_Admin
         }
         $this->_redirectReferer();
     }
+
+    protected function _isAllowed()
+    {
+        return Mage::getSingleton('admin/session')->isAllowed('sales/callcenter');
+    }
 }
