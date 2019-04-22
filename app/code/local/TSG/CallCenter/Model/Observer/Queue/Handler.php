@@ -61,11 +61,13 @@ class TSG_CallCenter_Model_Observer_Queue_Handler
                     if (!in_array($order->getCustomerEmail(), $userMatchedEmails)) {
                         $userMatchedEmails[] = $order->getCustomerEmail();
                     }
+                    break;
                 }
             }
             $matchedOrderIdsByEmails = $this->checkByEmails($itemQueue, $ordersCollection, $userMatchedEmails);
             if (!empty($matchedOrderIdsByEmails)) {
                 $userMatchedIds = array_unique(array_merge($userMatchedIds, $matchedOrderIdsByEmails));
+                $userMatchedIds = array_values($userMatchedIds);
             }
             if (!empty($userMatchedIds)) {
                 $this->queueData[$itemQueue->getUserId()] = $userMatchedIds;
@@ -106,7 +108,8 @@ class TSG_CallCenter_Model_Observer_Queue_Handler
         /* @var Mage_Sales_Model_Order $modelOrder */
         $modelOrder = Mage::getModel('sales/order');
         $ordersCollection = $modelOrder->getCollection();
-        $ordersCollection->addFieldToFilter('initiator_id', array('null' => true));
+        $ordersCollection->addFieldToFilter('initiator_id', array('null' => true))
+            ->setOrder('created_at', 'ASC');
         return $ordersCollection;
     }
 

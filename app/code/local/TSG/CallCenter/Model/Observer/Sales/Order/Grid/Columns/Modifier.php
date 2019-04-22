@@ -40,9 +40,9 @@ class TSG_CallCenter_Model_Observer_Sales_Order_Grid_Columns_Modifier
     {
         /* @var TSG_CallCenter_Model_Queue $callcenterQueue */
         $callcenterQueue = Mage::getModel('callcenter/queue');
-        if ($callcenterQueue->isAllowedByRole(1)) {
+        if ($callcenterQueue->isAllowedByRole($callcenterQueue->getSpecialistRolesKey())) {
             $collection->addAttributeToFilter('initiator_id', Mage::getSingleton('admin/session')->getUser()->getUserId());
-        }elseif ($callcenterQueue->isAllowedByRole(2)) {
+        }elseif ($callcenterQueue->isAllowedByRole($callcenterQueue->getCoordinatorRolesKey())) {
             $collection->addAttributeToFilter('initiator_id', array('notnull' => true));
         }
     }

@@ -1,6 +1,15 @@
 <?php
 class TSG_Callcenter_Test_Model_Observer_Queue_HandlerTest extends PHPUnit_Framework_TestCase
 {
+    private const ORDERS_TYPE_NIGHT = '1';
+    private const ORDERS_TYPE_DAY = '2';
+    private const ORDERS_TYPE_NOT_SPECIFIED = '0';
+
+    private const PRODUCTS_TYPE_LARGE_DEVICES = '1';
+    private const PRODUCTS_TYPE_SMALL_DEVICES = '2';
+    private const PRODUCTS_TYPE_GADGETS = '3';
+    private const PRODUCTS_TYPE_NOT_SPECIFIED = '0';
+
     /** @var TSG_CallCenter_Model_Observer_Queue_Handler $handler */
     private $handler;
 
@@ -63,8 +72,8 @@ class TSG_Callcenter_Test_Model_Observer_Queue_HandlerTest extends PHPUnit_Frame
                     [
                         'queue_id' => 1,
                         'user_id' => 9,
-                        'products_type' => 1,
-                        'orders_type' => 0
+                        'products_type' => self::PRODUCTS_TYPE_LARGE_DEVICES,
+                        'orders_type' => self::ORDERS_TYPE_NOT_SPECIFIED
                     ]
                 ],
                 [
@@ -84,8 +93,8 @@ class TSG_Callcenter_Test_Model_Observer_Queue_HandlerTest extends PHPUnit_Frame
                     [
                         'queue_id' => 2,
                         'user_id' => 8,
-                        'products_type' => 1,
-                        'orders_type' => 0
+                        'products_type' => self::PRODUCTS_TYPE_LARGE_DEVICES,
+                        'orders_type' => self::ORDERS_TYPE_NOT_SPECIFIED
                     ]
                 ],
                 [
@@ -99,7 +108,7 @@ class TSG_Callcenter_Test_Model_Observer_Queue_HandlerTest extends PHPUnit_Frame
                     ],
                     [
                         'id' => 200,
-                        'customer_email' => 'test2@example.com',
+                        'customer_email' => 'test@example.com',
                         'created_at' => '2013-04-04 03:34:48',
                         'ordered_items' => [
                             ['custom_product_type' => 'КБТ'],
@@ -114,8 +123,8 @@ class TSG_Callcenter_Test_Model_Observer_Queue_HandlerTest extends PHPUnit_Frame
                     [
                         'queue_id' => 3,
                         'user_id' => 10,
-                        'products_type' => 2,
-                        'orders_type' => 0
+                        'products_type' => self::PRODUCTS_TYPE_SMALL_DEVICES,
+                        'orders_type' => self::ORDERS_TYPE_NOT_SPECIFIED
                     ]
                 ],
                 [
@@ -135,14 +144,14 @@ class TSG_Callcenter_Test_Model_Observer_Queue_HandlerTest extends PHPUnit_Frame
                     [
                         'queue_id' => 1,
                         'user_id' => 8,
-                        'products_type' => 1,
-                        'orders_type' => 2
+                        'products_type' => self::PRODUCTS_TYPE_LARGE_DEVICES,
+                        'orders_type' => self::ORDERS_TYPE_DAY
                     ],
                     [
                         'queue_id' => 2,
                         'user_id' => 9,
-                        'products_type' => 1,
-                        'orders_type' => 1
+                        'products_type' => self::PRODUCTS_TYPE_LARGE_DEVICES,
+                        'orders_type' => self::ORDERS_TYPE_NIGHT
                     ]
                 ],
                 [
@@ -171,14 +180,14 @@ class TSG_Callcenter_Test_Model_Observer_Queue_HandlerTest extends PHPUnit_Frame
                     [
                         'queue_id' => 1,
                         'user_id' => 8,
-                        'products_type' => 3,
-                        'orders_type' => 2
+                        'products_type' => self::PRODUCTS_TYPE_GADGETS,
+                        'orders_type' => self::ORDERS_TYPE_DAY
                     ],
                     [
                         'queue_id' => 2,
                         'user_id' => 9,
-                        'products_type' => 1,
-                        'orders_type' => 1
+                        'products_type' => self::PRODUCTS_TYPE_LARGE_DEVICES,
+                        'orders_type' => self::ORDERS_TYPE_NIGHT
                     ]
                 ],
                 [
@@ -207,20 +216,20 @@ class TSG_Callcenter_Test_Model_Observer_Queue_HandlerTest extends PHPUnit_Frame
                     [
                         'queue_id' => 1,
                         'user_id' => 8,
-                        'products_type' => 0,
-                        'orders_type' => 1
+                        'products_type' => self::PRODUCTS_TYPE_NOT_SPECIFIED,
+                        'orders_type' => self::ORDERS_TYPE_NIGHT
                     ],
                     [
                         'queue_id' => 2,
                         'user_id' => 9,
-                        'products_type' => 1,
-                        'orders_type' => 2
+                        'products_type' => self::PRODUCTS_TYPE_LARGE_DEVICES,
+                        'orders_type' => self::ORDERS_TYPE_DAY
                     ]
                 ],
                 [
                     [
                         'id' => 100,
-                        'customer_email' => 'test@example.com',
+                        'customer_email' => 'test3@example.com',
                         'created_at' => '2013-04-04 10:34:48',
                         'ordered_items' => [
                             ['custom_product_type' => 'КБТ']
@@ -252,14 +261,14 @@ class TSG_Callcenter_Test_Model_Observer_Queue_HandlerTest extends PHPUnit_Frame
                     [
                         'queue_id' => 1,
                         'user_id' => 8,
-                        'products_type' => 0,
-                        'orders_type' => 1
+                        'products_type' => self::PRODUCTS_TYPE_NOT_SPECIFIED,
+                        'orders_type' => self::ORDERS_TYPE_NIGHT
                     ],
                     [
                         'queue_id' => 2,
                         'user_id' => 9,
-                        'products_type' => 1,
-                        'orders_type' => 2
+                        'products_type' => self::PRODUCTS_TYPE_LARGE_DEVICES,
+                        'orders_type' => self::ORDERS_TYPE_DAY
                     ]
                 ],
                 [
@@ -297,14 +306,14 @@ class TSG_Callcenter_Test_Model_Observer_Queue_HandlerTest extends PHPUnit_Frame
                     [
                         'queue_id' => 1,
                         'user_id' => 8,
-                        'products_type' => 0,
-                        'orders_type' => 1
+                        'products_type' => self::PRODUCTS_TYPE_NOT_SPECIFIED,
+                        'orders_type' => self::ORDERS_TYPE_NIGHT
                     ],
                     [
                         'queue_id' => 2,
                         'user_id' => 9,
-                        'products_type' => 1,
-                        'orders_type' => 2
+                        'products_type' => self::PRODUCTS_TYPE_LARGE_DEVICES,
+                        'orders_type' => self::ORDERS_TYPE_DAY
                     ]
                 ],
                 [
@@ -350,20 +359,20 @@ class TSG_Callcenter_Test_Model_Observer_Queue_HandlerTest extends PHPUnit_Frame
                     [
                         'queue_id' => 1,
                         'user_id' => 8,
-                        'products_type' => 0,
-                        'orders_type' => 1
+                        'products_type' => self::PRODUCTS_TYPE_NOT_SPECIFIED,
+                        'orders_type' => self::ORDERS_TYPE_NIGHT
                     ],
                     [
                         'queue_id' => 2,
                         'user_id' => 9,
-                        'products_type' => 1,
-                        'orders_type' => 2
+                        'products_type' => self::PRODUCTS_TYPE_LARGE_DEVICES,
+                        'orders_type' => self::ORDERS_TYPE_DAY
                     ]
                 ],
                 [
                     [
                         'id' => 100,
-                        'customer_email' => 'test@example.com',
+                        'customer_email' => 'test3@example.com',
                         'created_at' => '2013-04-04 10:34:48',
                         'ordered_items' => [
                             ['custom_product_type' => 'КБТ']
@@ -389,7 +398,7 @@ class TSG_Callcenter_Test_Model_Observer_Queue_HandlerTest extends PHPUnit_Frame
                     ],
                     [
                         'id' => 400,
-                        'customer_email' => 'test@example.com',
+                        'customer_email' => 'test2@example.com',
                         'created_at' => '2013-04-04 06:34:48',
                         'ordered_items' => [
                             ['custom_product_type' => '']
@@ -403,23 +412,24 @@ class TSG_Callcenter_Test_Model_Observer_Queue_HandlerTest extends PHPUnit_Frame
                     [
                         'queue_id' => 1,
                         'user_id' => 8,
-                        'products_type' => 0,
-                        'orders_type' => 1
+                        'products_type' => self::PRODUCTS_TYPE_NOT_SPECIFIED,
+                        'orders_type' => self::ORDERS_TYPE_NIGHT
                     ],
                     [
                         'queue_id' => 2,
                         'user_id' => 9,
-                        'products_type' => 3,
-                        'orders_type' => 2
+                        'products_type' => self::PRODUCTS_TYPE_GADGETS,
+                        'orders_type' => self::ORDERS_TYPE_DAY
                     ]
                 ],
                 [
                     [
                         'id' => 100,
                         'customer_email' => 'test@example.com',
-                        'created_at' => '2013-04-04 10:34:48',
+                        'created_at' => '2013-04-04 05:34:48',
                         'ordered_items' => [
-                            ['custom_product_type' => 'МБТ']
+                            ['custom_product_type' => ''],
+                            ['custom_product_type' => '']
                         ]
                     ],
                     [
@@ -442,7 +452,7 @@ class TSG_Callcenter_Test_Model_Observer_Queue_HandlerTest extends PHPUnit_Frame
                     ],
                     [
                         'id' => 400,
-                        'customer_email' => 'test@example.com',
+                        'customer_email' => 'test3@example.com',
                         'created_at' => '2013-04-04 14:34:48',
                         'ordered_items' => [
                             ['custom_product_type' => 'Гаджеты']
@@ -484,7 +494,9 @@ class TSG_Callcenter_Test_Model_Observer_Queue_HandlerTest extends PHPUnit_Frame
     {
         $collection = $this->modelOrder;
 
-        foreach ($itemsOrder as $itemOrder) {
+        $sortedItemsOrder = $this->getSortedArray($itemsOrder);
+
+        foreach ($sortedItemsOrder as $itemOrder) {
             $item = new Varien_Object();
             $item->setId($itemOrder['id']);
             $item->setCustomerEmail($itemOrder['customer_email']);
@@ -501,5 +513,23 @@ class TSG_Callcenter_Test_Model_Observer_Queue_HandlerTest extends PHPUnit_Frame
         }
 
         return $collection;
+    }
+
+    /**
+     * Sorting assoc array by key
+     *
+     * @param array $items
+     * @param string $sortKey
+     * @return array
+     */
+    private function getSortedArray(array $items, string $sortKey = 'created_at')
+    {
+        $sortBy = array();
+        foreach ($items as $key => $row)
+        {
+            $sortBy[$key] = $row[$sortKey];
+        }
+        array_multisort($sortBy, SORT_ASC, $items);
+        return $items;
     }
 }

@@ -1,6 +1,9 @@
 <?php
 class TSG_CallCenter_Model_Queue extends Mage_Core_Model_Abstract
 {
+    private const SPECIALIST_ROLES_KEY = 1;
+    private const COORDINATOR_ROLES_KEY = 2;
+
     private const ALLOWED_ROLE_NAMES = array(
         1 => array('CallCenterSpecialist'),
         2 => array('CallCenterCoordinator')
@@ -33,6 +36,22 @@ class TSG_CallCenter_Model_Queue extends Mage_Core_Model_Abstract
     }
 
     /**
+     * @return int
+     */
+    public function getSpecialistRolesKey()
+    {
+        return self::SPECIALIST_ROLES_KEY;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCoordinatorRolesKey()
+    {
+        return self::COORDINATOR_ROLES_KEY;
+    }
+
+    /**
      * @return array
      */
     public function getProductTypes()
@@ -56,7 +75,7 @@ class TSG_CallCenter_Model_Queue extends Mage_Core_Model_Abstract
      */
     public function isAllowedByRole(int $roleType): bool
     {
-        $allowed = false;
+        $allowed = true;
         if (in_array(Mage::getSingleton('admin/session')->getUser()->getRole()->getRoleName(), self::ALLOWED_ROLE_NAMES[$roleType])) {
             $allowed = true;
         }
@@ -66,25 +85,37 @@ class TSG_CallCenter_Model_Queue extends Mage_Core_Model_Abstract
     /**
      * Get count rows in queue by current user
      *
-     * @return mixed
+     * @param int $limit
+     * @return array
      */
-    public function getCountByUser()
+    public function getCountByUser(int $limit = null): array
     {
-        return $this->getCollection()->addFieldToFilter('user_id', Mage::getSingleton('admin/session')->getUser()->getId())->count();
+        if ($limit === null) {
+            $limit = 10;
+        }
+        /* @var Mage_Admin_Model_User $adminUser */
+        $adminUser = Mage::getSingleton('admin/session')->getUser();
+        $collection = $this->getCollection()
+            ->addFieldToFilter('user_id', $adminUser->getId());
+        return $collection->getAllIds($limit);
     }
 
     /**
-     * Get count orders in database by current user and filter by order statuses
+     * Get count orders in database by current user filtered by order statuses
      *
-     * @param array $statuses
-     * @return mixed
+     * @param int $limit
+     * @return array
      */
-    public function getCountOrdersByUser(array $statuses = array('pending'))
+    public function getCountOrdersByUser(int $limit = null): array
     {
+        $statuses = array('pending');
+        if ($limit === null) {
+            $limit = 10;
+        }
         $orders = Mage::getModel('sales/order')->getCollection()
             ->addFieldToFilter('status', array('in' => $statuses))
             ->addFieldToFilter('initiator_id', Mage::getSingleton('admin/session')->getUser()->getId());
-        return $orders->count();
+        return $orders->getAllIds($limit);
     }
 
     /**

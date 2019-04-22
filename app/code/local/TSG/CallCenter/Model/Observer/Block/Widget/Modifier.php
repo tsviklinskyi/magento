@@ -16,7 +16,7 @@ class TSG_CallCenter_Model_Observer_Block_Widget_Modifier
             case 'adminhtml/sales_order':
                 /* @var TSG_CallCenter_Model_Queue $callcenterQueue */
                 $callcenterQueue = Mage::getModel('callcenter/queue');
-                if ($callcenterQueue->isAllowedByRole(1) && $callcenterQueue->getCountOrdersByUser() === 0) {
+                if ($callcenterQueue->isAllowedByRole($callcenterQueue->getSpecialistRolesKey()) && $callcenterQueue->getCountOrdersByUser() === 0) {
                     if ($callcenterQueue->getCountByUser()) {
                         $data = array(
                             'label'     => 'Waiting order',
@@ -35,7 +35,7 @@ class TSG_CallCenter_Model_Observer_Block_Widget_Modifier
             case 'adminhtml/sales_order_view':
                 /* @var TSG_CallCenter_Model_Queue $callcenterQueue */
                 $callcenterQueue = Mage::getModel('callcenter/queue');
-                if($callcenterQueue->isAllowedByRole(2)) {
+                if($callcenterQueue->isAllowedByRole($callcenterQueue->getCoordinatorRolesKey())) {
                     $order = Mage::registry('current_order');
                     $data = array(
                         'label'     => 'Clear Initiator',
@@ -62,7 +62,7 @@ class TSG_CallCenter_Model_Observer_Block_Widget_Modifier
         $callcenterQueue = Mage::getModel('callcenter/queue');
         if (get_class($block) === 'Mage_Adminhtml_Block_Widget_Grid_Massaction'
             && $block->getRequest()->getControllerName() === 'sales_order'
-            && $callcenterQueue->isAllowedByRole(2)
+            && $callcenterQueue->isAllowedByRole($callcenterQueue->getCoordinatorRolesKey())
         ) {
             $block->addItem('clear_initiator', array(
                 'label' => Mage::helper('sales')->__('Clear Initiator'),

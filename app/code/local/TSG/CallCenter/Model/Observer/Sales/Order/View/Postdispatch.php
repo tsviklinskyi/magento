@@ -12,7 +12,7 @@ class TSG_CallCenter_Model_Observer_Sales_Order_View_Postdispatch
         $initiatorId = Mage::getSingleton('admin/session')->getUser()->getId();
         /* @var TSG_CallCenter_Model_Queue $callcenterQueue */
         $callcenterQueue = Mage::getModel('callcenter/queue');
-        if ($callcenterQueue->isAllowedByRole(1)) {
+        if ($callcenterQueue->isAllowedByRole($callcenterQueue->getSpecialistRolesKey())) {
             $callcenterQueue->saveInitiatorToOrders((int)$initiatorId, array($orderId));
         }
         return $this;
