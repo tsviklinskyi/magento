@@ -1,23 +1,17 @@
 <?php
 class TSG_Callcenter_Test_Model_Observer_Queue_HandlerTest extends PHPUnit_Framework_TestCase
 {
-    private const ORDERS_TYPE_NIGHT = '1';
-    private const ORDERS_TYPE_DAY = '2';
-    private const ORDERS_TYPE_NOT_SPECIFIED = '0';
-
-    private const PRODUCTS_TYPE_LARGE_DEVICES = '1';
-    private const PRODUCTS_TYPE_SMALL_DEVICES = '2';
-    private const PRODUCTS_TYPE_GADGETS = '3';
-    private const PRODUCTS_TYPE_NOT_SPECIFIED = '0';
-
     /** @var TSG_CallCenter_Model_Observer_Queue_Handler $handler */
     private $handler;
-
-    /** @var TSG_CallCenter_Model_Adapter_Queue_Collection $modelQueue */
+    
+    /** @var TSG_CallCenter_Model_Queue $modelQueue */
     private $modelQueue;
 
-    /** @var TSG_CallCenter_Model_Adapter_Order_Collection $modelOrder */
-    private $modelOrder;
+    /** @var TSG_CallCenter_Model_Adapter_Queue_Collection $adapterModelQueue */
+    private $adapterModelQueue;
+
+    /** @var TSG_CallCenter_Model_Adapter_Order_Collection $adapterModelOrder */
+    private $adapterModelOrder;
 
     public function __construct($name = null, array $data = [], $dataName = '')
     {
@@ -32,8 +26,9 @@ class TSG_Callcenter_Test_Model_Observer_Queue_HandlerTest extends PHPUnit_Frame
     public function setUp()
     {
         $this->handler = Mage::getModel('callcenter/observer_queue_handler');
-        $this->modelQueue = Mage::getModel('callcenter/adapter_queue_collection');
-        $this->modelOrder = Mage::getModel('callcenter/adapter_order_collection');
+        $this->modelQueue = Mage::getModel('callcenter/queue');
+        $this->adapterModelQueue = Mage::getModel('callcenter/adapter_queue_collection');
+        $this->adapterModelOrder = Mage::getModel('callcenter/adapter_order_collection');
         parent::setUp();
     }
 
@@ -41,7 +36,8 @@ class TSG_Callcenter_Test_Model_Observer_Queue_HandlerTest extends PHPUnit_Frame
     {
         $this->handler = null;
         $this->modelQueue = null;
-        $this->modelOrder = null;
+        $this->adapterModelQueue = null;
+        $this->adapterModelOrder = null;
         parent::tearDown();
     }
 
@@ -66,14 +62,14 @@ class TSG_Callcenter_Test_Model_Observer_Queue_HandlerTest extends PHPUnit_Frame
 
     public function provider()
     {
-        return [
+        $result = [
             'one user one matched order' => [
                 [
                     [
                         'queue_id' => 1,
                         'user_id' => 9,
-                        'products_type' => self::PRODUCTS_TYPE_LARGE_DEVICES,
-                        'orders_type' => self::ORDERS_TYPE_NOT_SPECIFIED
+                        'products_type' => TSG_CallCenter_Model_Queue::PRODUCTS_TYPE_LARGE_DEVICES,
+                        'orders_type' => TSG_CallCenter_Model_Queue::ORDERS_TYPE_NOT_SPECIFIED
                     ]
                 ],
                 [
@@ -93,8 +89,8 @@ class TSG_Callcenter_Test_Model_Observer_Queue_HandlerTest extends PHPUnit_Frame
                     [
                         'queue_id' => 2,
                         'user_id' => 8,
-                        'products_type' => self::PRODUCTS_TYPE_LARGE_DEVICES,
-                        'orders_type' => self::ORDERS_TYPE_NOT_SPECIFIED
+                        'products_type' => TSG_CallCenter_Model_Queue::PRODUCTS_TYPE_LARGE_DEVICES,
+                        'orders_type' => TSG_CallCenter_Model_Queue::ORDERS_TYPE_NOT_SPECIFIED
                     ]
                 ],
                 [
@@ -123,8 +119,8 @@ class TSG_Callcenter_Test_Model_Observer_Queue_HandlerTest extends PHPUnit_Frame
                     [
                         'queue_id' => 3,
                         'user_id' => 10,
-                        'products_type' => self::PRODUCTS_TYPE_SMALL_DEVICES,
-                        'orders_type' => self::ORDERS_TYPE_NOT_SPECIFIED
+                        'products_type' => TSG_CallCenter_Model_Queue::PRODUCTS_TYPE_SMALL_DEVICES,
+                        'orders_type' => TSG_CallCenter_Model_Queue::ORDERS_TYPE_NOT_SPECIFIED
                     ]
                 ],
                 [
@@ -144,14 +140,14 @@ class TSG_Callcenter_Test_Model_Observer_Queue_HandlerTest extends PHPUnit_Frame
                     [
                         'queue_id' => 1,
                         'user_id' => 8,
-                        'products_type' => self::PRODUCTS_TYPE_LARGE_DEVICES,
-                        'orders_type' => self::ORDERS_TYPE_DAY
+                        'products_type' => TSG_CallCenter_Model_Queue::PRODUCTS_TYPE_LARGE_DEVICES,
+                        'orders_type' => TSG_CallCenter_Model_Queue::ORDERS_TYPE_DAY
                     ],
                     [
                         'queue_id' => 2,
                         'user_id' => 9,
-                        'products_type' => self::PRODUCTS_TYPE_LARGE_DEVICES,
-                        'orders_type' => self::ORDERS_TYPE_NIGHT
+                        'products_type' => TSG_CallCenter_Model_Queue::PRODUCTS_TYPE_LARGE_DEVICES,
+                        'orders_type' => TSG_CallCenter_Model_Queue::ORDERS_TYPE_NIGHT
                     ]
                 ],
                 [
@@ -180,14 +176,14 @@ class TSG_Callcenter_Test_Model_Observer_Queue_HandlerTest extends PHPUnit_Frame
                     [
                         'queue_id' => 1,
                         'user_id' => 8,
-                        'products_type' => self::PRODUCTS_TYPE_GADGETS,
-                        'orders_type' => self::ORDERS_TYPE_DAY
+                        'products_type' => TSG_CallCenter_Model_Queue::PRODUCTS_TYPE_GADGETS,
+                        'orders_type' => TSG_CallCenter_Model_Queue::ORDERS_TYPE_DAY
                     ],
                     [
                         'queue_id' => 2,
                         'user_id' => 9,
-                        'products_type' => self::PRODUCTS_TYPE_LARGE_DEVICES,
-                        'orders_type' => self::ORDERS_TYPE_NIGHT
+                        'products_type' => TSG_CallCenter_Model_Queue::PRODUCTS_TYPE_LARGE_DEVICES,
+                        'orders_type' => TSG_CallCenter_Model_Queue::ORDERS_TYPE_NIGHT
                     ]
                 ],
                 [
@@ -216,14 +212,14 @@ class TSG_Callcenter_Test_Model_Observer_Queue_HandlerTest extends PHPUnit_Frame
                     [
                         'queue_id' => 1,
                         'user_id' => 8,
-                        'products_type' => self::PRODUCTS_TYPE_NOT_SPECIFIED,
-                        'orders_type' => self::ORDERS_TYPE_NIGHT
+                        'products_type' => TSG_CallCenter_Model_Queue::PRODUCTS_TYPE_NOT_SPECIFIED,
+                        'orders_type' => TSG_CallCenter_Model_Queue::ORDERS_TYPE_NIGHT
                     ],
                     [
                         'queue_id' => 2,
                         'user_id' => 9,
-                        'products_type' => self::PRODUCTS_TYPE_LARGE_DEVICES,
-                        'orders_type' => self::ORDERS_TYPE_DAY
+                        'products_type' => TSG_CallCenter_Model_Queue::PRODUCTS_TYPE_LARGE_DEVICES,
+                        'orders_type' => TSG_CallCenter_Model_Queue::ORDERS_TYPE_DAY
                     ]
                 ],
                 [
@@ -261,14 +257,14 @@ class TSG_Callcenter_Test_Model_Observer_Queue_HandlerTest extends PHPUnit_Frame
                     [
                         'queue_id' => 1,
                         'user_id' => 8,
-                        'products_type' => self::PRODUCTS_TYPE_NOT_SPECIFIED,
-                        'orders_type' => self::ORDERS_TYPE_NIGHT
+                        'products_type' => TSG_CallCenter_Model_Queue::PRODUCTS_TYPE_NOT_SPECIFIED,
+                        'orders_type' => TSG_CallCenter_Model_Queue::ORDERS_TYPE_NIGHT
                     ],
                     [
                         'queue_id' => 2,
                         'user_id' => 9,
-                        'products_type' => self::PRODUCTS_TYPE_LARGE_DEVICES,
-                        'orders_type' => self::ORDERS_TYPE_DAY
+                        'products_type' => TSG_CallCenter_Model_Queue::PRODUCTS_TYPE_LARGE_DEVICES,
+                        'orders_type' => TSG_CallCenter_Model_Queue::ORDERS_TYPE_DAY
                     ]
                 ],
                 [
@@ -306,14 +302,14 @@ class TSG_Callcenter_Test_Model_Observer_Queue_HandlerTest extends PHPUnit_Frame
                     [
                         'queue_id' => 1,
                         'user_id' => 8,
-                        'products_type' => self::PRODUCTS_TYPE_NOT_SPECIFIED,
-                        'orders_type' => self::ORDERS_TYPE_NIGHT
+                        'products_type' => TSG_CallCenter_Model_Queue::PRODUCTS_TYPE_NOT_SPECIFIED,
+                        'orders_type' => TSG_CallCenter_Model_Queue::ORDERS_TYPE_NIGHT
                     ],
                     [
                         'queue_id' => 2,
                         'user_id' => 9,
-                        'products_type' => self::PRODUCTS_TYPE_LARGE_DEVICES,
-                        'orders_type' => self::ORDERS_TYPE_DAY
+                        'products_type' => TSG_CallCenter_Model_Queue::PRODUCTS_TYPE_LARGE_DEVICES,
+                        'orders_type' => TSG_CallCenter_Model_Queue::ORDERS_TYPE_DAY
                     ]
                 ],
                 [
@@ -359,14 +355,14 @@ class TSG_Callcenter_Test_Model_Observer_Queue_HandlerTest extends PHPUnit_Frame
                     [
                         'queue_id' => 1,
                         'user_id' => 8,
-                        'products_type' => self::PRODUCTS_TYPE_NOT_SPECIFIED,
-                        'orders_type' => self::ORDERS_TYPE_NIGHT
+                        'products_type' => TSG_CallCenter_Model_Queue::PRODUCTS_TYPE_NOT_SPECIFIED,
+                        'orders_type' => TSG_CallCenter_Model_Queue::ORDERS_TYPE_NIGHT
                     ],
                     [
                         'queue_id' => 2,
                         'user_id' => 9,
-                        'products_type' => self::PRODUCTS_TYPE_LARGE_DEVICES,
-                        'orders_type' => self::ORDERS_TYPE_DAY
+                        'products_type' => TSG_CallCenter_Model_Queue::PRODUCTS_TYPE_LARGE_DEVICES,
+                        'orders_type' => TSG_CallCenter_Model_Queue::ORDERS_TYPE_DAY
                     ]
                 ],
                 [
@@ -412,14 +408,14 @@ class TSG_Callcenter_Test_Model_Observer_Queue_HandlerTest extends PHPUnit_Frame
                     [
                         'queue_id' => 1,
                         'user_id' => 8,
-                        'products_type' => self::PRODUCTS_TYPE_NOT_SPECIFIED,
-                        'orders_type' => self::ORDERS_TYPE_NIGHT
+                        'products_type' => TSG_CallCenter_Model_Queue::PRODUCTS_TYPE_NOT_SPECIFIED,
+                        'orders_type' => TSG_CallCenter_Model_Queue::ORDERS_TYPE_NIGHT
                     ],
                     [
                         'queue_id' => 2,
                         'user_id' => 9,
-                        'products_type' => self::PRODUCTS_TYPE_GADGETS,
-                        'orders_type' => self::ORDERS_TYPE_DAY
+                        'products_type' => TSG_CallCenter_Model_Queue::PRODUCTS_TYPE_GADGETS,
+                        'orders_type' => TSG_CallCenter_Model_Queue::ORDERS_TYPE_DAY
                     ]
                 ],
                 [
@@ -462,6 +458,7 @@ class TSG_Callcenter_Test_Model_Observer_Queue_HandlerTest extends PHPUnit_Frame
                 [8 => [200], 9 => [300, 400]]
             ],
         ];
+        return $result;
     }
 
     /**
@@ -471,7 +468,7 @@ class TSG_Callcenter_Test_Model_Observer_Queue_HandlerTest extends PHPUnit_Frame
      */
     private function getCollectionQueueData($itemsQueue): TSG_CallCenter_Model_Adapter_Queue_Collection
     {
-        $collection = $this->modelQueue;
+        $collection = $this->adapterModelQueue;
 
         foreach ($itemsQueue as $itemQueue) {
             $item = new Varien_Object();
@@ -492,7 +489,7 @@ class TSG_Callcenter_Test_Model_Observer_Queue_HandlerTest extends PHPUnit_Frame
      */
     private function getCollectionOrderData($itemsOrder): TSG_CallCenter_Model_Adapter_Order_Collection
     {
-        $collection = $this->modelOrder;
+        $collection = $this->adapterModelOrder;
 
         $sortedItemsOrder = $this->getSortedArray($itemsOrder);
 

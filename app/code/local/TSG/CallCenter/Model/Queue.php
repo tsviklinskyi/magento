@@ -1,6 +1,15 @@
 <?php
 class TSG_CallCenter_Model_Queue extends Mage_Core_Model_Abstract
 {
+    public const ORDERS_TYPE_NIGHT = '1';
+    public const ORDERS_TYPE_DAY = '2';
+    public const ORDERS_TYPE_NOT_SPECIFIED = '0';
+
+    public const PRODUCTS_TYPE_LARGE_DEVICES = '1';
+    public const PRODUCTS_TYPE_SMALL_DEVICES = '2';
+    public const PRODUCTS_TYPE_GADGETS = '3';
+    public const PRODUCTS_TYPE_NOT_SPECIFIED = '0';
+
     private const SPECIALIST_ROLES_KEY = 1;
     private const COORDINATOR_ROLES_KEY = 2;
 
@@ -10,16 +19,16 @@ class TSG_CallCenter_Model_Queue extends Mage_Core_Model_Abstract
     );
 
     private const ORDER_TYPES = array(
-        '1' => 'Ночные - (с 20.00 до 08.00)',
-        '2' => 'Дневные - (с 08.00 до 20.00)',
-        '0' => 'Не указан'
+        self::ORDERS_TYPE_NIGHT => 'Ночные - (с 20.00 до 08.00)',
+        self::ORDERS_TYPE_DAY => 'Дневные - (с 08.00 до 20.00)',
+        self::ORDERS_TYPE_NOT_SPECIFIED => 'Не указан'
     );
 
     private const PRODUCT_TYPES = array(
-        '1' => 'КБТ',
-        '2' => 'МБТ',
-        '3' => 'Гаджеты',
-        '0' => 'Не указан'
+        self::PRODUCTS_TYPE_LARGE_DEVICES => 'КБТ',
+        self::PRODUCTS_TYPE_SMALL_DEVICES => 'МБТ',
+        self::PRODUCTS_TYPE_GADGETS => 'Гаджеты',
+        self::PRODUCTS_TYPE_NOT_SPECIFIED => 'Не указан'
     );
 
     protected function _construct()
