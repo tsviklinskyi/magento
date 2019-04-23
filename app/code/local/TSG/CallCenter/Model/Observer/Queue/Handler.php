@@ -156,21 +156,21 @@ class TSG_CallCenter_Model_Observer_Queue_Handler
      *
      * @param string $orderCreatedAt
      * @return bool
+     * @throws Exception
      */
     private function checkIsDayOrder(string $orderCreatedAt): bool
     {
-        $dayHoursFrom = TSG_CallCenter_Model_Queue::ORDERS_TYPE_DAY_HOURS_FROM;
-        $dayHoursTo = TSG_CallCenter_Model_Queue::ORDERS_TYPE_DAY_HOURS_TO;
-        for($i = $dayHoursFrom; $i < $dayHoursTo; $i++){
-            $like = $i;
-            if(strlen($like) === 1){
-                $like = '0' . $like;
-            }
-            $check = strpos($orderCreatedAt, ' ' . $like . ':');
-            if ($check !== false) {
-                return true;
-            }
-        }
-        return false;
+        $timeFrom = explode(':', TSG_CallCenter_Model_Queue::ORDERS_TYPE_DAY_TIME_FROM);
+        $timeTo = explode(':', TSG_CallCenter_Model_Queue::ORDERS_TYPE_DAY_TIME_TO);
+
+        $orderDate = new DateTime($orderCreatedAt);
+
+        $datetimeFrom = new DateTime($orderCreatedAt);
+        $datetimeTo = new DateTime($orderCreatedAt);
+
+        $datetimeFrom->setTime($timeFrom[0], $timeFrom[1]);
+        $datetimeTo->setTime($timeTo[0], $timeTo[1]);
+
+        return $datetimeFrom < $orderDate && $orderDate < $datetimeTo;
     }
 }
