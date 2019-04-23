@@ -40,6 +40,7 @@ class TSG_CallCenter_Model_Observer_Queue_Handler
      * @param TSG_CallCenter_Model_Adapter_Queue_Collection $collectionQueue
      * @param TSG_CallCenter_Model_Adapter_Order_Collection $ordersCollection
      * @return array
+     * @throws Exception
      */
     public function generateDataByQueue(TSG_CallCenter_Model_Adapter_Queue_Collection $collectionQueue, TSG_CallCenter_Model_Adapter_Order_Collection $ordersCollection): array
     {
@@ -52,7 +53,8 @@ class TSG_CallCenter_Model_Observer_Queue_Handler
 
         foreach ($collectionQueue as $itemQueue) {
             $userCustomKey = "product_type_{$itemQueue->getProductsType()}_order_type_{$itemQueue->getOrdersType()}";
-            if ($itemQueue->getOrdersType() === TSG_CallCenter_Model_Queue::ORDERS_TYPE_NOT_SPECIFIED) {
+            $orderTypeNotSpecified = $itemQueue->getOrdersType() === TSG_CallCenter_Model_Queue::ORDERS_TYPE_NOT_SPECIFIED;
+            if ($orderTypeNotSpecified) {
                 $userCustomKey = "product_type_{$itemQueue->getProductsType()}_order_type_";
                 $matched = $ordersCollection->getItemByColumnValueLike('custom_key', $userCustomKey);
             }else{
@@ -67,8 +69,16 @@ class TSG_CallCenter_Model_Observer_Queue_Handler
                 $matchedByEmail = $ordersCollection->getItemsByColumnValue('customer_email', $matched->getCustomerEmail());
                 if (!empty($matchedByEmail)) {
                     foreach ($matchedByEmail as $item) {
-                        $userMatchedIds[$itemQueue->getUserId()][] = $item->getId();
-                        $ordersCollection->removeItemByKey($item->getId());
+                        $matchedEmailItem = false;
+                        if ($orderTypeNotSpecified && strpos($item->getCustomKey(), $userCustomKey) !== false) {
+                            $matchedEmailItem = true;
+                        }elseif ($item->getCustomKey() === $userCustomKey) {
+                            $matchedEmailItem = true;
+                        }
+                        if ($matchedEmailItem) {
+                            $userMatchedIds[$itemQueue->getUserId()][] = $item->getId();
+                            $ordersCollection->removeItemByKey($item->getId());
+                        }
                     }
                 }
             }
@@ -118,8 +128,9 @@ class TSG_CallCenter_Model_Observer_Queue_Handler
      *
      * @param Varien_Object $order
      * @return string
+     * @throws Exception
      */
-    private function generateCustomKey(Varien_Object $order)
+    private function generateCustomKey(Varien_Object $order): string
     {
         /* @var TSG_CallCenter_Model_Queue $callcenterQueue */
         $callcenterQueue = Mage::getModel('callcenter/queue');
@@ -171,6 +182,6 @@ class TSG_CallCenter_Model_Observer_Queue_Handler
         $datetimeFrom->setTime($timeFrom[0], $timeFrom[1]);
         $datetimeTo->setTime($timeTo[0], $timeTo[1]);
 
-        return $datetimeFrom < $orderDate && $orderDate < $datetimeTo;
+        return $datetimeFrom <= $orderDate && $orderDate < $datetimeTo;
     }
 }

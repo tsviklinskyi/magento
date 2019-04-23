@@ -346,7 +346,7 @@ class TSG_Callcenter_Test_Model_Observer_Queue_HandlerTest extends PHPUnit_Frame
                         'ordered_items' => [
                             ['custom_product_type' => 'МБТ']
                         ]
-                    ],
+                    ]
                 ],
                 [8 => [200], 9 => [300]]
             ],
@@ -399,7 +399,7 @@ class TSG_Callcenter_Test_Model_Observer_Queue_HandlerTest extends PHPUnit_Frame
                         'ordered_items' => [
                             ['custom_product_type' => '']
                         ]
-                    ],
+                    ]
                 ],
                 [8 => [200, 400], 9 => [100, 300]]
             ],
@@ -453,10 +453,108 @@ class TSG_Callcenter_Test_Model_Observer_Queue_HandlerTest extends PHPUnit_Frame
                         'ordered_items' => [
                             ['custom_product_type' => 'Гаджеты']
                         ]
-                    ],
+                    ]
                 ],
                 [8 => [200], 9 => [300, 400]]
             ],
+            'two user three matched orders and time check' => [
+                [
+                    [
+                        'queue_id' => 1,
+                        'user_id' => 8,
+                        'products_type' => TSG_CallCenter_Model_Queue::PRODUCTS_TYPE_NOT_SPECIFIED,
+                        'orders_type' => TSG_CallCenter_Model_Queue::ORDERS_TYPE_NIGHT
+                    ],
+                    [
+                        'queue_id' => 2,
+                        'user_id' => 9,
+                        'products_type' => TSG_CallCenter_Model_Queue::PRODUCTS_TYPE_GADGETS,
+                        'orders_type' => TSG_CallCenter_Model_Queue::ORDERS_TYPE_DAY
+                    ]
+                ],
+                [
+                    [
+                        'id' => 100,
+                        'customer_email' => 'test2@example.com',
+                        'created_at' => '2013-04-04 08:09:59',
+                        'ordered_items' => [
+                            ['custom_product_type' => ''],
+                            ['custom_product_type' => '']
+                        ]
+                    ],
+                    [
+                        'id' => 200,
+                        'customer_email' => 'test3@example.com',
+                        'created_at' => '2013-04-04 08:10:00',
+                        'ordered_items' => [
+                            ['custom_product_type' => 'Гаджеты'],
+                            ['custom_product_type' => '']
+                        ]
+                    ],
+                    [
+                        'id' => 300,
+                        'customer_email' => 'test3@example.com',
+                        'created_at' => '2013-04-04 20:54:59',
+                        'ordered_items' => [
+                            ['custom_product_type' => 'Гаджеты']
+                        ]
+                    ]
+                ],
+                [8 => [100], 9 => [200, 300]]
+            ],
+            'two user three matched orders and one not matched and time check' => [
+                [
+                    [
+                        'queue_id' => 1,
+                        'user_id' => 8,
+                        'products_type' => TSG_CallCenter_Model_Queue::PRODUCTS_TYPE_NOT_SPECIFIED,
+                        'orders_type' => TSG_CallCenter_Model_Queue::ORDERS_TYPE_NIGHT
+                    ],
+                    [
+                        'queue_id' => 2,
+                        'user_id' => 9,
+                        'products_type' => TSG_CallCenter_Model_Queue::PRODUCTS_TYPE_GADGETS,
+                        'orders_type' => TSG_CallCenter_Model_Queue::ORDERS_TYPE_DAY
+                    ]
+                ],
+                [
+                    [
+                        'id' => 100,
+                        'customer_email' => 'test@example.com',
+                        'created_at' => '2013-04-04 08:10:01',
+                        'ordered_items' => [
+                            ['custom_product_type' => 'Гаджеты'],
+                            ['custom_product_type' => '']
+                        ]
+                    ],
+                    [
+                        'id' => 200,
+                        'customer_email' => 'test2@example.com',
+                        'created_at' => '2013-04-04 08:09:59',
+                        'ordered_items' => [
+                            ['custom_product_type' => ''],
+                            ['custom_product_type' => '']
+                        ]
+                    ],
+                    [
+                        'id' => 300,
+                        'customer_email' => 'test2@example.com',
+                        'created_at' => '2013-04-04 20:55:00',
+                        'ordered_items' => [
+                            ['custom_product_type' => '']
+                        ]
+                    ],
+                    [
+                        'id' => 400,
+                        'customer_email' => 'test2@example.com',
+                        'created_at' => '2013-04-04 20:54:59',
+                        'ordered_items' => [
+                            ['custom_product_type' => '']
+                        ]
+                    ]
+                ],
+                [8 => [200, 300], 9 => [100]]
+            ]
         ];
         return $result;
     }
