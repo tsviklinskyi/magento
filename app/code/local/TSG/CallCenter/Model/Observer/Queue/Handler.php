@@ -124,11 +124,10 @@ class TSG_CallCenter_Model_Observer_Queue_Handler
         /* @var TSG_CallCenter_Model_Queue $callcenterQueue */
         $callcenterQueue = Mage::getModel('callcenter/queue');
 
-        $orderType = 0;
-        if ($this->checkOrderIsMatchByTimeRange($order->getCreatedAt(), 20, 8)) {
-            $orderType = 1;
-        }elseif($this->checkOrderIsMatchByTimeRange($order->getCreatedAt(), 8, 20)) {
-            $orderType = 2;
+        if ($this->checkIsDayOrder($order->getCreatedAt())) {
+            $orderType = TSG_CallCenter_Model_Queue::ORDERS_TYPE_DAY;
+        }else{
+            $orderType = TSG_CallCenter_Model_Queue::ORDERS_TYPE_NIGHT;
         }
 
         $typeCounts = [];
@@ -140,37 +139,29 @@ class TSG_CallCenter_Model_Observer_Queue_Handler
         }
 
         if ($typeCounts[$callcenterQueue->getProductTypes()[TSG_CallCenter_Model_Queue::PRODUCTS_TYPE_LARGE_DEVICES]] > 0) {
-            $productType = '1';
+            $productType = TSG_CallCenter_Model_Queue::PRODUCTS_TYPE_LARGE_DEVICES;
         }elseif ($typeCounts[$callcenterQueue->getProductTypes()[TSG_CallCenter_Model_Queue::PRODUCTS_TYPE_SMALL_DEVICES]] > 0) {
-            $productType = '2';
+            $productType = TSG_CallCenter_Model_Queue::PRODUCTS_TYPE_SMALL_DEVICES;
         }elseif ($typeCounts[$callcenterQueue->getProductTypes()[TSG_CallCenter_Model_Queue::PRODUCTS_TYPE_GADGETS]] > 0) {
-            $productType = '3';
+            $productType = TSG_CallCenter_Model_Queue::PRODUCTS_TYPE_GADGETS;
         }else {
-            $productType = '0';
+            $productType = TSG_CallCenter_Model_Queue::PRODUCTS_TYPE_NOT_SPECIFIED;
         }
 
         return "product_type_{$productType}_order_type_{$orderType}";
     }
 
     /**
-     * Check if order creation time is match by hours range
+     * Check if order creation time is match by day hours range
      *
      * @param string $orderCreatedAt
-     * @param int $from
-     * @param int $to
      * @return bool
      */
-    private function checkOrderIsMatchByTimeRange(string $orderCreatedAt, int $from, int $to): bool
+    private function checkIsDayOrder(string $orderCreatedAt): bool
     {
-        $n = $to;
-        if ($from > $to){
-            $n = $from + 23;
-        }
-        for($i = $from; $i < $n; $i++){
-            if($i === 24){
-                $i = 0;
-                $n = $to;
-            }
+        $dayHoursFrom = TSG_CallCenter_Model_Queue::ORDERS_TYPE_DAY_HOURS_FROM;
+        $dayHoursTo = TSG_CallCenter_Model_Queue::ORDERS_TYPE_DAY_HOURS_TO;
+        for($i = $dayHoursFrom; $i < $dayHoursTo; $i++){
             $like = $i;
             if(strlen($like) === 1){
                 $like = '0' . $like;

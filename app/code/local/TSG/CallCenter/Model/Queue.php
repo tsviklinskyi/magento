@@ -5,6 +5,9 @@ class TSG_CallCenter_Model_Queue extends Mage_Core_Model_Abstract
     public const ORDERS_TYPE_DAY = '2';
     public const ORDERS_TYPE_NOT_SPECIFIED = '0';
 
+    public const ORDERS_TYPE_DAY_HOURS_FROM = 8;
+    public const ORDERS_TYPE_DAY_HOURS_TO = 20;
+
     public const PRODUCTS_TYPE_LARGE_DEVICES = '1';
     public const PRODUCTS_TYPE_SMALL_DEVICES = '2';
     public const PRODUCTS_TYPE_GADGETS = '3';
