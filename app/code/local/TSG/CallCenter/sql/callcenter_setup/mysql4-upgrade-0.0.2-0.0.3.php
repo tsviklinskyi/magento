@@ -17,6 +17,9 @@ $attributeSet->save();
 
 $attributeSet->initFromSkeleton($entityTypeId)->save();
 
+/* @var TSG_CallCenter_Model_Queue $callcenterQueue */
+$callcenterQueue = Mage::getModel('callcenter/queue');
+
 $installer->addAttribute('catalog_product', 'custom_product_type', array(
     'group'                 => '',
     'label'                 => 'Custom Product Type',
@@ -33,7 +36,7 @@ $installer->addAttribute('catalog_product', 'custom_product_type', array(
     'user_defined'    => 1,
     'is_configurable' => 0,
     'global'          => Mage_Catalog_Model_Resource_Eav_Attribute::SCOPE_GLOBAL,
-    'option'          => array('values' => array('КБТ', 'МБТ', 'Гаджеты', 'Не указан')),
+    'option'          => ['values' => $callcenterQueue->getProductTypes()],
     'note'            => ''
 ));
 

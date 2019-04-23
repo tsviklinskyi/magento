@@ -5,6 +5,8 @@ class TSG_CallCenter_Model_Observer_Sales_Quote_Item
     {
         $quoteItem = $observer->getQuoteItem();
         $product = $observer->getProduct();
-        $quoteItem->setCustomProductType($product->getAttributeText('custom_product_type'));
+        if ($product->getAttributeText('custom_product_type')) {
+            $quoteItem->setCustomProductType($product->getAttributeText('custom_product_type'));
+        }
     }
 }
