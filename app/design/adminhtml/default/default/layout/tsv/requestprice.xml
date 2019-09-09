@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+ 
+<layout>
+    <adminhtml_requestprice_pricerequest_index>
+        <reference name="menu">
+            <action method="setActive">
+                <menupath>tsv_requestprice/pricerequest</menupath>
+            </action>
+        </reference>
+        <reference name="content">
+            <block type="tsv_requestprice/adminhtml_pricerequest" name="pricerequest" />
+
+        </reference>
+    </adminhtml_requestprice_pricerequest_index>
+    <adminhtml_requestprice_pricerequest_grid>
+        <block type="core/text_list" name="root" output="toHtml">
+            <block type="tsv_requestprice/adminhtml_pricerequest_grid" name="pricerequest_grid"/>
+        </block>
+    </adminhtml_requestprice_pricerequest_grid>
+    <!-- Pricerequest add/edit action -->
+    <adminhtml_requestprice_pricerequest_edit>
+        <update handle="editor"/>
+        <reference name="menu">
+            <action method="setActive">
+                <menupath>tsv_requestprice/pricerequest</menupath>
+            </action>
+        </reference>
+        <reference name="content">
+            <block type="tsv_requestprice/adminhtml_pricerequest_edit" name="pricerequest_edit"></block>
+        </reference>
+        <reference name="left">
+            <block type="tsv_requestprice/adminhtml_pricerequest_edit_tabs" name="pricerequest_tabs"></block>
+        </reference>
+    </adminhtml_requestprice_pricerequest_edit>
+
+</layout>

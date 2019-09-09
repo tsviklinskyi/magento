@@ -1,0 +1,15 @@
+<script type="text/javascript">
+    function openRequestPricePopup(element)
+    {
+        var product_sku = jQuery(element).attr('product_sku');
+        jQuery.ajax({
+            type: 'POST',
+            dataType: 'json',
+            data: {product_sku: product_sku},
+            url: 'requestprice/index/popup'
+        }).done(function(response) {
+            jQuery('body').append(response);
+        });
+    }
+</script>
+<button id="request-price" product_sku="<?php echo $this->getProduct()->getSku(); ?>" onclick="openRequestPricePopup(this);return false;">Request price</button>

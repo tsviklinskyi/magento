@@ -1,0 +1,34 @@
+body{
+    height: auto!important;
+    position: relative;
+}
+.window-overlay{
+    background: #00000036;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    z-index: 999;
+}
+.popup-wrapper{
+    width: 100%;
+    position: fixed;
+    float: left;
+    top: 100px;
+    z-index: 1000;
+}
+.request-price-popup{
+    background: white;
+    width: 500px;
+    margin: 0 auto;
+    padding: 20px;
+    position: relative;
+}
+.request-price-popup-head{
+    position: relative;
+}
+.request-price-popup-close{
+    position: absolute;
+    right: 0;
+    top: 0;
+}

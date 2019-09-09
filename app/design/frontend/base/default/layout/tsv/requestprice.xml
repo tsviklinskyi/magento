@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<layout version="0.1.0">
+    <default>
+        <reference name="head">
+            <action method="addItem">
+                <type>skin_css</type>
+                <name>css/tsv/requestprice.css</name>
+            </action>
+        </reference>
+        <reference name="catalog_product_price_template">
+            <action method="addPriceBlockType"><type>simple</type><block>catalog/product_price</block><template>tsv/catalog/product/view/price.phtml</template></action>
+            <action method="addPriceBlockType"><type>configurable</type><block>catalog/product_price</block><template>tsv/catalog/product/view/price.phtml</template></action>
+        </reference>
+    </default>
+    <tsv_requestprice_popup>
+        <block type="tsv_requestprice/requestprice_popup" name="requestprice.popup" template="tsv/requestprice/popup.phtml" />
+    </tsv_requestprice_popup>
+</layout>

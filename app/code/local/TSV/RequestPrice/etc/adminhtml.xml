@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<config>
+    <acl>
+        <resources>
+            <admin>
+                <children>
+                    <system>
+                        <children>
+                            <config>
+                                <children>
+                                    <tsv_requestprice translate="title" module="tsv_requestprice">
+                                        <title>RequestPrice</title>
+                                    </tsv_requestprice>
+                                </children>
+                            </config>
+                        </children>
+                    </system>
+                    <tsv_requestprice translate="title" module="tsv_requestprice">
+                        <title>Price Requests</title>
+                        <children>
+                            <pricerequest translate="title" module="tsv_requestprice">
+                                <title>Price Request</title>
+                                <sort_order>0</sort_order>
+                            </pricerequest>
+                        </children>
+                    </tsv_requestprice>
+                </children>
+            </admin>
+        </resources>
+    </acl>
+    <menu>
+        <catalog>
+            <children>
+                <tsv_requestprice translate="title" module="tsv_requestprice">
+                    <title>Price Requests</title>
+                    <sort_order>200</sort_order>
+                    <action>adminhtml/requestprice_pricerequest</action>
+                </tsv_requestprice>
+            </children>
+        </catalog>
+    </menu>
+</config>

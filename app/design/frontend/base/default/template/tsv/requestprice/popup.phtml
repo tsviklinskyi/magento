@@ -1,0 +1,57 @@
+<?php
+/** @var TSV_RequestPrice_Block_RequestPrice_Popup $this */
+?>
+<script type="text/javascript">
+    function closePopup() {
+        jQuery('#window-overlay, #popup-wrapper').remove();
+    }
+
+    function requestPrice()
+    {
+        var form = jQuery('#request-price-form');
+        jQuery.ajax({
+            type: 'POST',
+            dataType: 'json',
+            data: {form_data:form.serialize()},
+            url: 'requestprice/index/requestprice'
+        }).done(function(response) {
+            if(response.status){
+                closePopup();
+            }
+            if(response.message){
+                alert(response.message);
+            }
+        });
+    }
+
+    function validateRequestPriceForm(form) {
+
+    }
+</script>
+<div id="window-overlay" class="window-overlay"></div>
+<div id="popup-wrapper" class="popup-wrapper">
+    <div id="popup" class="request-price-popup">
+        <div class="request-price-popup-head">
+            <h3>Request price</h3>
+            <a href="javascript:void(0)" class="request-price-popup-close" onclick="closePopup();"><?php echo $this->__('Close') ?></a>
+        </div>
+        <div class="request-price-popup-body">
+            <form id="request-price-form" method="post">
+                <input type="hidden" name="product_sku" value="<?php echo $this->getProductSku(); ?>"/>
+                <div>
+                    <label for="requestprice_name"><?php echo $this->helper('tsv_requestprice')->__('Name') ?></label>
+                    <input type="text" id="requestprice_name" name="name"/>
+                </div>
+                <div>
+                    <label for="requestprice_email"><?php echo $this->helper('tsv_requestprice')->__('Email') ?></label>
+                    <input type="email" id="requestprice_email" name="email"/>
+                </div>
+                <div>
+                    <label for="requestprice_comment"><?php echo $this->helper('tsv_requestprice')->__('Comment') ?></label>
+                    <textarea id="requestprice_comment" name="comment"></textarea>
+                </div>
+                <button id="request-price" onclick="requestPrice();return false;">Request price</button>
+            </form>
+        </div>
+    </div>
+</div>
